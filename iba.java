@@ -57,3 +57,16 @@ RobotPosition follow_obstacle_boundary(RobotPosition current, Goal goal)
 	}
 	return current;
 }
+
+// Sensors work in progress...
+class MyEV3UltrasonicSensor implements ISensor {
+	SensorModes sensor = new EV3UltrasonicSensor(getPort());
+	SampleProvider distance= sensor.getMode("Distance");
+	float[] sample = new float[distance.sampleSize()];
+
+	public float getRange() {
+		distance.fetchSample(sample, 0);
+		return sample[0];
+	}
+};
+
