@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package robo;
 
 import ch.aplu.robotsim.*;
@@ -56,12 +51,24 @@ public class Robo {
                 }
             }
             
-            Polar GetBest(/*Polar goal*/) {
+            private int DistXY(int x1, int y1, int x2, int y2) {
+                return (int)Math.sqrt((x1-x2)^2 + (y1-y2)^2);
+            }
+            
+            Polar GetBestRoute(int robo_x, int robo_y, double robo_angle, int goal_x, int goal_y) {
+                return Points.get(0);
                 //if (Points.isEmpty())
                 //    return goal;
-                // TODO
-                return Points.get(0);
-                //return goal;
+                Polar best = null;
+                int best_dist;
+                for (Polar p : Points) {
+                    if (best == null) {
+                        best = p;
+                        //best_dist = 
+                    } else {                        
+                    }
+                }
+                return best;
             }
             
             private ArrayList<Polar> Points = new ArrayList<Polar>();
@@ -69,18 +76,24 @@ public class Robo {
     }
 
     private static void addObstacles() {
-        Point mesh[] = {
+        Point mesh1[] = {
             new Point(-100, -50),
             new Point(-100, 50),
             new Point(100, 50),
             new Point(100, -50)
         };
-        RobotContext.useTarget(bar(200, 100, Color.red), mesh, 250, 250);
+        RobotContext.useTarget(bar(200, 100, Color.red), mesh1, 250, 250);
+
+        Point mesh2[] = {
+            new Point(-20, -20),
+            new Point(-20, 20),
+            new Point(20, 20),
+            new Point(20, -20)
+        };
+        RobotContext.useTarget(bar(40, 40, Color.red), mesh2, 400, 50);
     }
 
     static {
-        RobotContext.setStartPosition(100, 10);
-        RobotContext.setStartDirection(60);
         //RobotContext.showNavigationBar();
 
         addObstacles();
@@ -111,30 +124,73 @@ public class Robo {
     }
 
     static class Robot {
-        public static final int OneTurnTime = 2180;
+        public static final int OneTurnTime = 2190;
         public Gear gear;
         public UltrasonicSensor us;
         public LegoRobot robot;
+        
+        private int x;
+        private int y;
+        private double angle;
+        
+        int getX() { return gear.getX(); }
+        int getY() { return gear.getY(); }
+        double getAngle() { return angle; }
         
         int GetDistance() {
             int d = us.getDistance();
             //return (d==255 ? -1 : d);
             return d;
         }
+        
+        private static double NormalizeAngle(double a) {
+            while (a > 2*Math.PI)
+                a -= 2 * Math.PI;
+            while (a < 0)
+                a += 2 * Math.PI;
+            return a;
+        }
+        
+        void RotateRight(double a) {
+            System.out.println("RL:"+a);
+            a = NormalizeAngle(a);
+            angle = NormalizeAngle(angle + a);
 
-        Robot() {
+            boolean left = true;
+            if (a > Math.PI) {
+                a = 2 * Math.PI - a;
+                left = false;
+            }
+            final int time = (int) ((double)OneTurnTime * a / (2 * Math.PI));
+            if (left) {
+                gear.left(time);
+            } else {
+                gear.right(time);
+            }
+            Tools.delay(time+100);
+        }
+        
+        void RotateLeft(double a) {
+            System.out.println("RR:"+a);
+            RotateRight(2*Math.PI - a);
+        }
+        
+        Robot(int xx, int yy) {
+            x = xx;
+            y = yy;
+            RobotContext.setStartPosition(x, y);
+            angle = 0;
+            RobotContext.setStartDirection(0);
+
             robot = new LegoRobot();
 
             gear = new Gear();
             robot.addPart(gear);
 
-            //ts = new TouchSensor(SensorPort.S3);
-            //robot.addPart(ts);
             us = new UltrasonicSensor(SensorPort.S1);
             us.setBeamAreaColor(Color.green);
             us.setMeshTriangleColor(Color.blue);
             us.setProximityCircleColor(Color.lightGray);
-            //us.addUltrasonicListener(listener);
             robot.addPart(us);
         }
     }
@@ -144,13 +200,14 @@ public class Robo {
         TangentBug.TangentGraph tg = new TangentBug.TangentGraph();
         
         Tools.startTimer();
-        r.gear.left();
+        r.gear.right();
         
         tg.Visit(r.GetDistance(), 0);
         while (Tools.getTime() < Robot.OneTurnTime) {
             int d = r.GetDistance();
-            double angle = 360 * Tools.getTime() / Robot.OneTurnTime;
-            tg.Visit(d, angle);
+            double local_angle = 2 * Math.PI * Tools.getTime() / Robot.OneTurnTime;
+            double global_angle = local_angle + r.getAngle();
+            tg.Visit(d, global_angle);
             Tools.delay(10);
         }
         r.gear.stop();
@@ -174,48 +231,25 @@ public class Robo {
 
     static void RunRobot(Robot r) {
         r.gear.forward();
-        //r.gear.setSpeed(10);
         TillObstacle(r, 100);
         r.gear.stop();
-        Tools.delay(1000);
+        //Tools.delay(1000);
         TangentBug.TangentGraph tg = ScanAround(r);
-        TangentBug.Polar best = tg.GetBest();
-        final double rotateTime = (double)Robot.OneTurnTime * best.angle / 360;
-        r.gear.left();
-        Tools.delay((int)rotateTime);
-        r.gear.stop();
+        TangentBug.Polar best = tg.GetBestRoute(0,0,0,0,0);
+        r.RotateLeft(best.angle);
         r.gear.forward();
-        Tools.delay(10000);
+        
+        Tools.delay(5000);
         
         r.robot.exit();
-        return;
-        /*
-        r.gear.setSpeed(30);
-        r.gear.forward();
-        while (true) {
-            final double arc = 0.3;
-            final int dist = r.us.getDistance();
-            System.out.println("Dist: " + dist);
-            if (dist > 0 && dist < 100) {
-                r.gear.leftArc(arc);
-                final int dist1 = r.us.getDistance();
-                while (dist1 > 0 && dist1 < 200) {
-                    Tools.delay(10);
-                }
-                r.gear.forward();
-                Tools.delay(10000);
-            }
-            Tools.delay(100);
-        }
-        //Tools.delay(20000);
-
-        //r.robot.exit();
-        */
     }
 
     public static void main(String[] args) {
         try {
-            Robot r = new Robot();
+            Robot r = new Robot(100, 20);
+            Tools.delay(1000);
+            r.RotateLeft(Math.PI/3);
+            Tools.delay(2000);
             RunRobot(r);
         } catch (Exception ex) {
             System.out.println("Exception: " + ex);
