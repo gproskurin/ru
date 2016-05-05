@@ -9,13 +9,19 @@ import java.util.ArrayList;
 
 
 public class Robo {
-    
+    static class Polar {
+        int distance;
+        double angle;
+        Polar(int d, double a) { distance = d; angle = a; }
+    }
+
+    static Point PolarToDecart(Polar p)
+    {
+        double dd = (double)p.distance;
+        return new Point((int)(dd*Math.cos(p.angle)), (int)(dd*Math.sin(p.angle)));
+    }
+
     static class TangentBug {
-        static class Polar {
-            Polar (int d, double a) { distance = d; angle = a; }
-            int distance;
-            double angle;
-        }
         
         static class TangentGraph {
             private static boolean MiddleIsUseless(Polar p1, Polar p2, Polar p3) {
@@ -51,21 +57,31 @@ public class Robo {
                 }
             }
             
-            private int DistXY(int x1, int y1, int x2, int y2) {
-                return (int)Math.sqrt((x1-x2)^2 + (y1-y2)^2);
+            int GetDist(Point p1, Point p2) {
+                return (int)Math.sqrt(Math.pow(p1.x-p2.x,2) + Math.pow(p1.y-p2.y,2));
             }
             
-            Polar GetBestRoute(int robo_x, int robo_y, double robo_angle, int goal_x, int goal_y) {
-                return Points.get(0);
+            Polar GetBestRoute(Point robo, double robo_angle, Point goal) {
+                //return Points.get(0);
                 //if (Points.isEmpty())
                 //    return goal;
+                // TODO goal is reacheable? FIXME
                 Polar best = null;
-                int best_dist;
+                int best_dist = Integer.MAX_VALUE;
                 for (Polar p : Points) {
-                    if (best == null) {
+                    System.out.println("polar: d:"+p.distance+" angle:"+p.angle);
+                    if (p.distance < 0) {
+                        System.out.println("skip");
+                        continue;
+                    }
+                    final Point pd_local = PolarToDecart(p);
+                    final Point pd = new Point(pd_local.x+robo.x, pd_local.y+robo.y);
+                    final int dist = GetDist(robo, pd) + GetDist(pd, goal); // TODO simplify
+                    System.out.println("pd x="+pd.x+" y="+pd.y+" dist="+dist);
+                    if (best==null || dist<best_dist) {
+                        System.out.println("replace best");
                         best = p;
-                        //best_dist = 
-                    } else {                        
+                        best_dist = dist;
                     }
                 }
                 return best;
@@ -73,54 +89,6 @@ public class Robo {
             
             private ArrayList<Polar> Points = new ArrayList<Polar>();
         }
-    }
-
-    private static void addObstacles() {
-        Point mesh1[] = {
-            new Point(-100, -50),
-            new Point(-100, 50),
-            new Point(100, 50),
-            new Point(100, -50)
-        };
-        RobotContext.useTarget(bar(200, 100, Color.red), mesh1, 250, 250);
-
-        Point mesh2[] = {
-            new Point(-20, -20),
-            new Point(-20, 20),
-            new Point(20, 20),
-            new Point(20, -20)
-        };
-        RobotContext.useTarget(bar(40, 40, Color.red), mesh2, 400, 50);
-    }
-
-    static {
-        //RobotContext.showNavigationBar();
-
-        addObstacles();
-
-        //RobotContext.useObstacle(bar(200, 100, Color.red), 250, 250);
-        //RobotContext.useTarget(bar(200, 100, Color.red), 250, 250);
-        //RobotContext.useObstacle(bar(300, 20, Color.green), 250, 350);
-        //RobotContext.useObstacle(bar(20, 300, Color.blue), 150, 250);
-        //RobotContext.useObstacle(bar(20, 300, Color.yellow), 350, 250);
-        //RobotContext.useObstacle(circle(20, Color.black), 250, 250);
-    }
-
-    /*
-        private static GGBitmap circle(int radius, Color color) {
-            GGBitmap bm = new GGBitmap(2 * radius, 2 * radius);
-            bm.setPaintColor(color);
-            bm.setLineWidth(3);
-            bm.drawCircle(new Point(radius, radius), radius - 1);
-            return bm;
-        }
-     */
-
-    private static GGBitmap bar(int width, int length, Color color) {
-        GGBitmap bm = new GGBitmap(width, length);
-        bm.setPaintColor(color);
-        bm.fillRectangle(new Point(0, 0), new Point(width - 1, length - 1));
-        return bm;
     }
 
     static class Robot {
@@ -196,14 +164,16 @@ public class Robo {
     {
         TangentBug.TangentGraph tg = new TangentBug.TangentGraph();
         
+        final double robot_angle = r.getAngle();
+
         Tools.startTimer();
         r.gearRotate();
         
-        tg.Visit(r.GetDistance(), 0);
+        tg.Visit(r.GetDistance(), robot_angle);
         while (Tools.getTime() < Robot.OneTurnTime) {
             int d = r.GetDistance();
             double local_angle = 2 * Math.PI * Tools.getTime() / Robot.OneTurnTime;
-            double global_angle = local_angle + r.getAngle();
+            double global_angle = local_angle + robot_angle;
             tg.Visit(d, global_angle);
             Tools.delay(10);
         }
@@ -228,12 +198,12 @@ public class Robo {
 
     static void RunRobot(Robot r) {
         r.gear.forward();
-        TillObstacle(r, 100);
+        TillObstacle(r, 80);
         r.gear.stop();
         //Tools.delay(1000);
         TangentBug.TangentGraph tg = ScanAround(r);
-        TangentBug.Polar best = tg.GetBestRoute(0,0,0,0,0);
-        r.Rotate(best.angle);
+        Polar best = tg.GetBestRoute(new Point(r.getX(),r.getY()), r.getAngle(), new Point(goal_x,goal_y));
+        r.Rotate(best.angle - r.getAngle());
         r.gear.forward();
         
         Tools.delay(5000);
@@ -251,5 +221,56 @@ public class Robo {
         } catch (Exception ex) {
             System.out.println("Exception: " + ex);
         }
+    }
+
+    private static void addObstacles() {
+        Point mesh1[] = {
+            new Point(-100, -50),
+            new Point(-100, 50),
+            new Point(100, 50),
+            new Point(100, -50)
+        };
+        RobotContext.useTarget(bar(200, 100, Color.red), mesh1, 250, 250);
+
+        Point mesh2[] = {
+            new Point(-20, -20),
+            new Point(-20, 20),
+            new Point(20, 20),
+            new Point(20, -20)
+        };
+        RobotContext.useTarget(bar(40, 40, Color.red), mesh2, 400, 50);
+    }
+
+    //static final int goal_x = 200;
+    //static final int goal_y = 490;
+    static final int goal_x = 400;
+    static final int goal_y = 300;
+
+    static {
+        //RobotContext.showNavigationBar();
+
+        addObstacles();
+
+        //RobotContext.useObstacle(bar(200, 100, Color.red), 250, 250);
+        //RobotContext.useTarget(bar(200, 100, Color.red), 250, 250);
+        //RobotContext.useObstacle(bar(300, 20, Color.green), 250, 350);
+        //RobotContext.useObstacle(bar(20, 300, Color.blue), 150, 250);
+        //RobotContext.useObstacle(bar(20, 300, Color.yellow), 350, 250);
+        RobotContext.useObstacle(circle(5, Color.black), goal_x, goal_y);
+    }
+
+    private static GGBitmap circle(int radius, Color color) {
+        GGBitmap bm = new GGBitmap(2 * radius, 2 * radius);
+        bm.setPaintColor(color);
+        bm.setLineWidth(3);
+        bm.drawCircle(new Point(radius, radius), radius - 1);
+        return bm;
+    }
+
+    private static GGBitmap bar(int width, int length, Color color) {
+        GGBitmap bm = new GGBitmap(width, length);
+        bm.setPaintColor(color);
+        bm.fillRectangle(new Point(0, 0), new Point(width - 1, length - 1));
+        return bm;
     }
 }
