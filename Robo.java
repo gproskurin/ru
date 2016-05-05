@@ -47,7 +47,7 @@ public class Robo {
                     Points.remove(0);
                 }
                 for (Polar p : Points) {
-                    System.out.println("Dist:"+p.distance+" angle:"+p.angle);
+                    System.out.println("Dist:"+p.distance+" angle:"+p.angle+" deg:"+p.angle*360/2/Math.PI);
                 }
             }
             
@@ -137,42 +137,39 @@ public class Robo {
         int getY() { return gear.getY(); }
         double getAngle() { return angle; }
         
+        void gearRotate() { gear.right(); }
+
         int GetDistance() {
             int d = us.getDistance();
             //return (d==255 ? -1 : d);
             return d;
         }
         
+        // Converts angle to [-pi, pi] interval
         private static double NormalizeAngle(double a) {
-            while (a > 2*Math.PI)
+            while (a > Math.PI)
                 a -= 2 * Math.PI;
-            while (a < 0)
+            while (a < -Math.PI)
                 a += 2 * Math.PI;
             return a;
         }
         
-        void RotateRight(double a) {
+        void Rotate(double a) {
             System.out.println("RL:"+a);
             a = NormalizeAngle(a);
+
+            //if (Math.abs(a) < 0.01)
+            //    return;
+
             angle = NormalizeAngle(angle + a);
 
-            boolean left = true;
-            if (a > Math.PI) {
-                a = 2 * Math.PI - a;
-                left = false;
-            }
-            final int time = (int) ((double)OneTurnTime * a / (2 * Math.PI));
-            if (left) {
-                gear.left(time);
-            } else {
+            final int time = (int) ((double)OneTurnTime * Math.abs(a) / (2 * Math.PI));
+            if (a > 0) {
                 gear.right(time);
+            } else {
+                gear.left(time);
             }
             Tools.delay(time+100);
-        }
-        
-        void RotateLeft(double a) {
-            System.out.println("RR:"+a);
-            RotateRight(2*Math.PI - a);
         }
         
         Robot(int xx, int yy) {
@@ -200,7 +197,7 @@ public class Robo {
         TangentBug.TangentGraph tg = new TangentBug.TangentGraph();
         
         Tools.startTimer();
-        r.gear.right();
+        r.gearRotate();
         
         tg.Visit(r.GetDistance(), 0);
         while (Tools.getTime() < Robot.OneTurnTime) {
@@ -236,7 +233,7 @@ public class Robo {
         //Tools.delay(1000);
         TangentBug.TangentGraph tg = ScanAround(r);
         TangentBug.Polar best = tg.GetBestRoute(0,0,0,0,0);
-        r.RotateLeft(best.angle);
+        r.Rotate(best.angle);
         r.gear.forward();
         
         Tools.delay(5000);
@@ -248,7 +245,7 @@ public class Robo {
         try {
             Robot r = new Robot(100, 20);
             Tools.delay(1000);
-            r.RotateLeft(Math.PI/3);
+            r.Rotate(Math.PI/3);
             Tools.delay(2000);
             RunRobot(r);
         } catch (Exception ex) {
