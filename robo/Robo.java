@@ -13,15 +13,16 @@ public class Robo {
 
     static class Robot {
         public static final int OneTurnTime = 2190;
+        static final int RoboSize = 10; // safety interval fron center of robot to abstacles
         public Gear gear;
         public UltrasonicSensor us;
         public LegoRobot robot;
-        
+
         private double angle = 0;
         int getX() { return gear.getX(); }
         int getY() { return gear.getY(); }
         double getAngle() { return angle; }
-        
+
         void gearRotate() { gear.right(); }
 
         int GetDistance() {
@@ -29,7 +30,7 @@ public class Robo {
             //return (d==255 ? -1 : d);
             return d;
         }
-        
+
         void Rotate(double a) {
             //System.out.println("RL:"+a);
             a = Utils.NormalizeAngle(a);
@@ -47,7 +48,7 @@ public class Robo {
             }
             Tools.delay(time+100);
         }
-        
+
         Robot(int x, int y) {
             RobotContext.setStartPosition(x, y);
             angle = 0;
@@ -65,32 +66,32 @@ public class Robo {
             robot.addPart(us);
         }
     }
-    
+
     static TangentBug.TangentGraph ScanAround(Robot r)
     {
         TangentBug.TangentGraph tg = new TangentBug.TangentGraph();
-        
+
         final double robot_angle = r.getAngle();
 
         Tools.startTimer();
         r.gearRotate();
-        
+
         tg.Visit(r.GetDistance(), robot_angle);
         while (Tools.getTime() < Robot.OneTurnTime) {
             int d = r.GetDistance();
-            double local_angle = 2 * Math.PI * Tools.getTime() / Robot.OneTurnTime;
-            double global_angle = local_angle + robot_angle;
-            tg.Visit(d, global_angle);
+            final double robotPovAngle = 2 * Math.PI * Tools.getTime() / Robot.OneTurnTime;
+            final double absoluteAngle = robotPovAngle + robot_angle;
+            tg.Visit(d, absoluteAngle);
             Tools.delay(10);
         }
         r.gear.stop();
         Tools.delay(1000);
         //tg.Visit(r.GetDistance(), 360);
         tg.Finish();
-        
+
         return tg;
     }
-    
+
     static void TillObstacle(Robot r, int dist)
     {
         while (true) {
@@ -108,12 +109,15 @@ public class Robo {
         r.gear.stop();
         //Tools.delay(1000);
         TangentBug.TangentGraph tg = ScanAround(r);
-        Polar best = tg.GetBestRoute(new Point(r.getX(),r.getY()), r.getAngle(), new Point(goal_x,goal_y));
-        r.Rotate(best.angle - r.getAngle());
+        final PolarTurn best = tg.GetBestRoute(new Point(r.getX(),r.getY()), r.getAngle(), new Point(goal_x,goal_y));
+        final Polar motion = Utils.ToRobotMotion(best, Robot.RoboSize);
+
+        final double deltaAngle = motion.angle - r.getAngle(); // convert from absolute angle to robot's POV angle
+        r.Rotate(deltaAngle);
         r.gear.forward();
-        
+
         Tools.delay(5000);
-        
+
         r.robot.exit();
     }
 
