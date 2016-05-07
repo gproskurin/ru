@@ -4,92 +4,12 @@ import ch.aplu.robotsim.*;
 //import ch.aplu.util.*;
 import java.awt.*;
 import ch.aplu.jgamegrid.*;
-import java.util.ArrayList;
 //import ch.aplu.ev3.*;
+import robo.Utils.*;
+//import static robo.Utils.NormalizeAngle;
 
 
 public class Robo {
-    static class Polar {
-        int distance;
-        double angle;
-        Polar(int d, double a) { distance = d; angle = a; }
-    }
-
-    static Point PolarToDecart(Polar p)
-    {
-        double dd = (double)p.distance;
-        return new Point((int)(dd*Math.cos(p.angle)), (int)(dd*Math.sin(p.angle)));
-    }
-
-    static class TangentBug {
-        
-        static class TangentGraph {
-            private static boolean MiddleIsUseless(Polar p1, Polar p2, Polar p3) {
-                final int sig1 = Integer.signum(p1.distance);
-                final int sig2 = Integer.signum(p2.distance);
-                final int sig3 = Integer.signum(p3.distance);
-                return sig1==sig2 && sig2==sig3;
-            }
-            
-            void Visit(int dist, double angle) {
-                final Polar p = new Polar(dist, angle);
-                if (Points.isEmpty()) {
-                    Points.add(p);
-                    return;
-                }
-                if (Points.size() >= 2 && MiddleIsUseless(Points.get(Points.size() - 2), Points.get(Points.size() - 1), p)) {
-                    Points.set(Points.size() - 1, p);
-                    return;
-                }
-                // add point
-                Points.add(p);
-            }
-            
-            void Finish() {
-                if (Points.size() >= 2 && MiddleIsUseless(Points.get(Points.size() - 2), Points.get(Points.size() - 1), Points.get(0))) {
-                    Points.remove(Points.size()-1);
-                }
-                if (Points.size() >= 2 && MiddleIsUseless(Points.get(Points.size() - 1), Points.get(0), Points.get(1))) {
-                    Points.remove(0);
-                }
-                for (Polar p : Points) {
-                    System.out.println("Dist:"+p.distance+" angle:"+p.angle+" deg:"+p.angle*360/2/Math.PI);
-                }
-            }
-            
-            int GetDist(Point p1, Point p2) {
-                return (int)Math.sqrt(Math.pow(p1.x-p2.x,2) + Math.pow(p1.y-p2.y,2));
-            }
-            
-            Polar GetBestRoute(Point robo, double robo_angle, Point goal) {
-                //return Points.get(0);
-                //if (Points.isEmpty())
-                //    return goal;
-                // TODO goal is reacheable? FIXME
-                Polar best = null;
-                int best_dist = Integer.MAX_VALUE;
-                for (Polar p : Points) {
-                    System.out.println("polar: d:"+p.distance+" angle:"+p.angle);
-                    if (p.distance < 0) {
-                        System.out.println("skip");
-                        continue;
-                    }
-                    final Point pd_local = PolarToDecart(p);
-                    final Point pd = new Point(pd_local.x+robo.x, pd_local.y+robo.y);
-                    final int dist = GetDist(robo, pd) + GetDist(pd, goal); // TODO simplify
-                    System.out.println("pd x="+pd.x+" y="+pd.y+" dist="+dist);
-                    if (best==null || dist<best_dist) {
-                        System.out.println("replace best");
-                        best = p;
-                        best_dist = dist;
-                    }
-                }
-                return best;
-            }
-            
-            private ArrayList<Polar> Points = new ArrayList<Polar>();
-        }
-    }
 
     static class Robot {
         public static final int OneTurnTime = 2190;
@@ -97,10 +17,7 @@ public class Robo {
         public UltrasonicSensor us;
         public LegoRobot robot;
         
-        private int x;
-        private int y;
-        private double angle;
-        
+        private double angle = 0;
         int getX() { return gear.getX(); }
         int getY() { return gear.getY(); }
         double getAngle() { return angle; }
@@ -113,23 +30,14 @@ public class Robo {
             return d;
         }
         
-        // Converts angle to [-pi, pi] interval
-        private static double NormalizeAngle(double a) {
-            while (a > Math.PI)
-                a -= 2 * Math.PI;
-            while (a < -Math.PI)
-                a += 2 * Math.PI;
-            return a;
-        }
-        
         void Rotate(double a) {
-            System.out.println("RL:"+a);
-            a = NormalizeAngle(a);
+            //System.out.println("RL:"+a);
+            a = Utils.NormalizeAngle(a);
 
             //if (Math.abs(a) < 0.01)
             //    return;
 
-            angle = NormalizeAngle(angle + a);
+            angle = Utils.NormalizeAngle(angle + a);
 
             final int time = (int) ((double)OneTurnTime * Math.abs(a) / (2 * Math.PI));
             if (a > 0) {
@@ -140,9 +48,7 @@ public class Robo {
             Tools.delay(time+100);
         }
         
-        Robot(int xx, int yy) {
-            x = xx;
-            y = yy;
+        Robot(int x, int y) {
             RobotContext.setStartPosition(x, y);
             angle = 0;
             RobotContext.setStartDirection(0);
