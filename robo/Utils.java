@@ -10,6 +10,11 @@ public class Utils {
         Polar(int d, double a) { distance=d; angle=a; }
     }
 
+    static class PolarSegment {
+        Polar begin;
+        Polar end;
+    }
+
     static class PolarTurn {
         Polar polar;
         int turnSign; // {-1,+1}
@@ -17,14 +22,15 @@ public class Utils {
     }
 
     // convert mathematically calculated values to reality:
-    // - correct angle, so robot moves slightly aside from obstacle's edge, not directly to it
+    // - correct angle, so robot moves slightly aside from obstacle's edge, not directly to it (robot have non-zero size)
     // - slightly increase distance, so robot moves slightly farther than obstacle's edge
     static Polar ToRobotMotion(PolarTurn p, int roboSize)
     {
         double angleCorrection = Math.asin((double)(roboSize*2)/(double)p.polar.distance);
         if (p.turnSign < 0)
-            angleCorrection = - angleCorrection;
-        return new Polar(p.polar.distance + 2*roboSize, p.polar.angle + angleCorrection);
+            angleCorrection = -angleCorrection;
+        final int distCorrection = 2 * roboSize;
+        return new Polar(p.polar.distance + distCorrection, p.polar.angle + angleCorrection);
     }
 
     // Converts angle to [-pi, pi] interval

@@ -21,6 +21,7 @@ public class Robo {
         private double angle = 0;
         int getX() { return gear.getX(); }
         int getY() { return gear.getY(); }
+        Point getPoint() { return new Point(getX(), getY()); }
         double getAngle() { return angle; }
 
         void gearRotate() { gear.right(); }
@@ -109,7 +110,11 @@ public class Robo {
         r.gear.stop();
         //Tools.delay(1000);
         TangentBug.TangentGraph tg = ScanAround(r);
-        final PolarTurn best = tg.GetBestRoute(new Point(r.getX(),r.getY()), r.getAngle(), new Point(goal_x,goal_y));
+        final PolarTurn best = tg.GetBestRoute(r.getPoint(), r.getAngle(), new Point(goal_x,goal_y));
+        if (best == null) {
+            TangentBug.FollowWall();
+            // TODO
+        }
         final Polar motion = Utils.ToRobotMotion(best, Robot.RoboSize);
 
         final double deltaAngle = motion.angle - r.getAngle(); // convert from absolute angle to robot's POV angle
