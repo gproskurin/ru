@@ -1,19 +1,16 @@
 package robo;
 
 import ch.aplu.robotsim.*;
-//import ch.aplu.util.*;
 import java.awt.*;
 import ch.aplu.jgamegrid.*;
-//import ch.aplu.ev3.*;
-import robo.Utils.*;
-//import static robo.Utils.NormalizeAngle;
-
 
 public class Robo {
 
     static class Robot {
-        public static final int OneTurnTime = 2190;
+        static final int OneTurnTime = 2190;
         static final int RoboSize = 10; // safety interval fron center of robot to abstacles
+        static private int Speed = -1; // units/second
+
         public Gear gear;
         public UltrasonicSensor us;
         public LegoRobot robot;
@@ -33,12 +30,7 @@ public class Robo {
         }
 
         void Rotate(double a) {
-            //System.out.println("RL:"+a);
             a = Utils.NormalizeAngle(a);
-
-            //if (Math.abs(a) < 0.01)
-            //    return;
-
             angle = Utils.NormalizeAngle(angle + a);
 
             final int time = (int) ((double)OneTurnTime * Math.abs(a) / (2 * Math.PI));
@@ -48,6 +40,24 @@ public class Robo {
                 gear.left(time);
             }
             Tools.delay(time+100);
+        }
+
+        void Forward(int dist) {
+            assert Speed > 0; // must be calibrated
+            final int time = dist * 1000/Speed;
+            gear.forward(time);
+            Tools.delay(time+100);
+        }
+
+        private void CalibrateSpeed() {
+            final int time = 1000;
+            final Point begin = getPoint();
+            gear.forward(time);
+            Tools.delay(time + 100);
+            gear.stop();
+            final Point end = getPoint();
+            final int dist = Utils.GetDist(begin, end);
+            Speed = dist;
         }
 
         Robot(int x, int y) {
@@ -65,74 +75,17 @@ public class Robo {
             us.setMeshTriangleColor(Color.blue);
             us.setProximityCircleColor(Color.lightGray);
             robot.addPart(us);
+
+            CalibrateSpeed();
         }
-    }
-
-    static TangentBug.TangentGraph ScanAround(Robot r)
-    {
-        TangentBug.TangentGraph tg = new TangentBug.TangentGraph();
-
-        final double robot_angle = r.getAngle();
-
-        Tools.startTimer();
-        r.gearRotate();
-
-        tg.Visit(r.GetDistance(), robot_angle);
-        while (Tools.getTime() < Robot.OneTurnTime) {
-            int d = r.GetDistance();
-            final double robotPovAngle = 2 * Math.PI * Tools.getTime() / Robot.OneTurnTime;
-            final double absoluteAngle = robotPovAngle + robot_angle;
-            tg.Visit(d, absoluteAngle);
-            Tools.delay(10);
-        }
-        r.gear.stop();
-        Tools.delay(1000);
-        //tg.Visit(r.GetDistance(), 360);
-        tg.Finish();
-
-        return tg;
-    }
-
-    static void TillObstacle(Robot r, int dist)
-    {
-        while (true) {
-            final int d = r.us.getDistance();
-            if (d >= 0 && d <= dist) {
-                return;
-            }
-            Tools.delay(10);
-        }
-    }
-
-    static void RunRobot(Robot r) {
-        r.gear.forward();
-        TillObstacle(r, 80);
-        r.gear.stop();
-        //Tools.delay(1000);
-        TangentBug.TangentGraph tg = ScanAround(r);
-        final PolarTurn best = tg.GetBestRoute(r.getPoint(), r.getAngle(), new Point(goal_x,goal_y));
-        if (best == null) {
-            TangentBug.FollowWall();
-            // TODO
-        }
-        final Polar motion = Utils.ToRobotMotion(best, Robot.RoboSize);
-
-        final double deltaAngle = motion.angle - r.getAngle(); // convert from absolute angle to robot's POV angle
-        r.Rotate(deltaAngle);
-        r.gear.forward();
-
-        Tools.delay(5000);
-
-        r.robot.exit();
     }
 
     public static void main(String[] args) {
         try {
-            Robot r = new Robot(100, 20);
+            final Robot r = new Robot(100, 20);
             Tools.delay(1000);
-            r.Rotate(Math.PI/3);
-            Tools.delay(2000);
-            RunRobot(r);
+            final Point goal = new Point(goal_x, goal_y);
+            TangentBug.Run(r, goal);
         } catch (Exception ex) {
             System.out.println("Exception: " + ex);
         }
