@@ -10,6 +10,7 @@ public class Utils {
         Polar(int d, double a) { distance=d; angle=a; }
     }
 
+    // polar coordinates to obstacle taking into account where the obstacle is - on the left
     static class PolarTurn {
         Polar polar;
         int turnSign; // {-1,+1}
@@ -28,7 +29,8 @@ public class Utils {
         return new Polar(p.polar.distance + distCorrection, p.polar.angle + angleCorrection);
     }
 
-    // Converts angle to [-pi, pi] interval
+    // Converts angle to [-pi, pi] interval. углы в радианах
+    // влево не более чем на 180 и вправо не более чем на 180
     static double NormalizeAngle(double a) {
         while (a > Math.PI) {
             a -= 2 * Math.PI;
@@ -52,6 +54,7 @@ public class Utils {
         return (i & 1) == 0;
     }
 
+    //to find angle of direction from p1 to p2
     static double ComputeAngle(final Point p1, final Point p2) {
         return Math.atan2((double)(p2.y - p1.y), (double)(p2.x - p1.x));
     }

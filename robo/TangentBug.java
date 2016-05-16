@@ -7,8 +7,8 @@ import java.util.Optional;
 import robo.Utils.*;
 
 public class TangentBug {
-    static private final int NearObstacle = 80;
-    static private final int NearGoal = 50;
+    static private final int NearObstacle = 80; //while moving forward - when robot see obstacle and estimated distance is less then 80, it stops
+    static private final int NearGoal = 50; //to enlarge goal influence
 
     static void Run(Robo.Robot r, final Point goal) {
 
@@ -19,14 +19,14 @@ public class TangentBug {
             }
 
             while (true) {
-                final double goalAbsoluteAngle = Utils.ComputeAngle(r.getPoint(), goal);
-                final TangentGraph tg = ScanAround(r, goalAbsoluteAngle);
+                final double goalAbsoluteAngle = Utils.ComputeAngle(r.getPoint(), goal); //what is current angle
+                final TangentGraph tg = ScanAround(r, goalAbsoluteAngle); //absoluteAngle - not dependent on robots angle
                 final PolarTurn best = tg.GetBestRoute(r.getPoint(), r.getAngle(), goal);
                 if (best == null) {
                     // TODO
                     FollowWall(r);
                 } else {
-                    // move to best node
+                    // move to the best node
                     MoveTo(r, best);
                 }
                 final int goalDist = Utils.GetDist(r.getPoint(), goal);
@@ -37,8 +37,9 @@ public class TangentBug {
         }
     }
 
+    // correction taking into account robot size
     static private void MoveTo(Robo.Robot r, PolarTurn node) {
-        final Polar motion = Utils.ToRobotMotion(node, Robo.Robot.RoboSize);
+        final Polar motion = Utils.ToRobotMotion(node, Robo.Robot.RoboSize); //
         final double deltaAngle = motion.angle - r.getAngle(); // convert from absolute angle to robot's POV angle
         r.Rotate(deltaAngle);
         r.Forward(motion.distance);
@@ -51,7 +52,7 @@ public class TangentBug {
     // return true if goal reached, false if obstacle occured
     private static boolean TillGoal(Robo.Robot r, final Point goal)
     {
-        final double angle = Utils.ComputeAngle(r.getPoint(), goal);
+        final double angle = Utils.ComputeAngle(r.getPoint(), goal); //find a direction where to turn. angle from robot to goal
         r.Rotate(angle);
         r.gear.forward();
         while (true) {
@@ -60,11 +61,11 @@ public class TangentBug {
                 return true;
             }
             final int d = r.us.getDistance();
-            if (d >= 0 && d <= NearObstacle) {
+            if (d >= 0 && d <= NearObstacle) { //we reached an obstacle
                 r.gear.stop();
                 return false;
             }
-            Tools.delay(10);
+            Tools.delay(10);  //small delay to relax
         }
     }
 
@@ -77,18 +78,18 @@ public class TangentBug {
 
         tg.AddSensorSample(r.GetDistance(), robot_angle);
 
-        Tools.startTimer();
+        Tools.startTimer(); //needed to calculate current turn angle
         r.gearRotate();
 
         while (Tools.getTime() < Robo.Robot.OneTurnTime) {
-            int d = r.GetDistance();
-            final double robotPovAngle = 2 * Math.PI * Tools.getTime() / Robo.Robot.OneTurnTime;
+            int d = r.GetDistance(); //distance to the nearest obstacle
+            final double robotPovAngle = 2 * Math.PI * Tools.getTime() / Robo.Robot.OneTurnTime;  //current angle of robot
             final double absoluteAngle = robotPovAngle + robot_angle;
             tg.AddSensorSample(d, absoluteAngle);
-            Tools.delay(10);
+            Tools.delay(10); //100 раз в секунду снятие показаний
         }
         r.gear.stop();
-        Tools.delay(1000);
+        Tools.delay(1000); //
         //tg.Visit(r.GetDistance(), 360);
         tg.Finish();
 
@@ -106,7 +107,7 @@ public class TangentBug {
         private Optional<Boolean> startedInsideSector = Optional.empty();
         private boolean insideSector = false;
 
-        private Polar goalSample = null;
+        private Polar goalSample = null; //to record the direction and distance to GOAL
         private final double goalAngle;
 
         TangentGraph(double goalAbsoluteAngle) {
@@ -175,8 +176,8 @@ public class TangentBug {
             }
         }
 
+        // searches tangent graph. returns null if local minima
         PolarTurn GetBestRoute(Point robo, double robo_angle, Point goal) {
-            // TODO goal is reacheable? FIXME
             assert !Nodes.isEmpty();
             final int dRoboGoal = Utils.GetDist(robo, goal);
             boolean localMin = true;
