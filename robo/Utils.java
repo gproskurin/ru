@@ -46,8 +46,12 @@ public class Utils {
         return new Point((int) (dd * Math.cos(p.angle)), (int) (dd * Math.sin(p.angle)));
     }
 
+    static int GetDist(int x1, int y1, int x2, int y2) {
+        return (int) Math.sqrt(Math.pow(x1 - x2, 2) + Math.pow(y1 - y2, 2));
+    }
+
     static int GetDist(Point p1, Point p2) {
-        return (int) Math.sqrt(Math.pow(p1.x - p2.x, 2) + Math.pow(p1.y - p2.y, 2));
+        return GetDist(p1.x, p1.y, p2.x, p2.y);
     }
 
     static boolean isEven(int i) {
@@ -55,7 +59,7 @@ public class Utils {
     }
 
     //to find angle of direction from p1 to p2
-    static double ComputeAngle(final Point p1, final Point p2) {
-        return Math.atan2((double)(p2.y - p1.y), (double)(p2.x - p1.x));
+    static double ComputeAngle(int x1, int y1, int x2, int y2) {
+        return Math.atan2((double)(y2 - y1), (double)(x2 - x1));
     }
 }
