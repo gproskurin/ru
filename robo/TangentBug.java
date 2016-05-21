@@ -7,7 +7,7 @@ import java.util.Optional;
 import robo.Utils.*;
 
 public class TangentBug implements IAlgorithm {
-    static private final int NearObstacle = 80; //while moving forward - when robot see obstacle and estimated distance is less then 80, it stops
+    static private final int NearObstacle = 70; //while moving forward - when robot see obstacle and estimated distance is less then 80, it stops
     static private final int NearGoal = 50; //to enlarge goal influence
 
     @Override
@@ -26,6 +26,7 @@ public class TangentBug implements IAlgorithm {
                 final PolarTurn best = tg.GetBestRoute(new Point(r.get_x(), r.get_y()), r.get_angle(), goal);
                 if (best == null) {
                     final Utils.FollowWallDirection fwd = tg.GetFollowWallDirection(r.get_x(), r.get_y(), goal_x, goal_y);
+                    System.out.println("FollowWall: wall_on_right?"+fwd.WallOnTheRight+" angle:"+fwd.angle);
                     FollowWall(r, fwd, goal_x, goal_y);
                 } else {
                     // move to the best node

@@ -76,7 +76,7 @@ public class Robo {
             assert Speed > 0; // must be calibrated, to bu sure not -1
             final int time = dist * 1000/Speed;
             gear.forward(time);
-            Tools.delay(time+100);
+            //Tools.delay(time+100);
         }
 
         @Override
