@@ -17,6 +17,15 @@ public class Utils {
         PolarTurn(Polar p, int sign) { polar=p; turnSign=sign; }
     }
 
+    static class FollowWallDirection {
+        boolean WallOnTheRight;
+        double angle;
+        FollowWallDirection(boolean wr, double a) {
+            WallOnTheRight = wr;
+            angle = a;
+        }
+    }
+
     // convert mathematically calculated values to reality:
     // - correct angle, so robot moves slightly aside from obstacle's point, not directly to it (robot have non-zero size)
     // - slightly increase distance, so robot moves slightly farther than obstacle's point
@@ -50,8 +59,17 @@ public class Utils {
         return (int) Math.sqrt(Math.pow(x1 - x2, 2) + Math.pow(y1 - y2, 2));
     }
 
+    static int GetDist(int x1, int y1, Point p2) {
+        return GetDist(x1, y1, p2.x, p2.y);
+    }
+
     static int GetDist(Point p1, Point p2) {
         return GetDist(p1.x, p1.y, p2.x, p2.y);
+    }
+
+    static Point DecartFromPoint(int x, int y, Polar pp) {
+        final Point pp_dec = PolarToDecart(pp);
+        return new Point(x + pp_dec.x, y + pp_dec.y);
     }
 
     static boolean isEven(int i) {

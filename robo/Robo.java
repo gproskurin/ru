@@ -92,7 +92,7 @@ public class Robo {
             final int begin_y = gear.getY();
 
             gear.forward(time); //function forward for 1 second
-            Tools.delay(time + 100); //delay . for sure
+            //Tools.delay(time + 100); //delay . for sure
 
             //
             final int end_x = gear.getX();
@@ -121,13 +121,15 @@ public class Robo {
             us.setProximityCircleColor(Color.lightGray);
             robot.addPart(us);
 
+            System.out.println("Calibrating speed...");
             CalibrateSpeed();
+            System.out.println(" - Calibrated, speed = "+Speed+" units/second");
         }
     }
 
     public static void main(String[] args) {
         try {
-            final IRobot r = new Robot(100, 20);  // parameters - corrdinates  x,y
+            final IRobot r = new Robot(20, 20);  // parameters - corrdinates  x,y
             Tools.delay(1000); //wait a second just to see how algorithm works (function from simulator)
             final IAlgorithm tb = new TangentBug();
             tb.run(r, goal_x, goal_y);
@@ -156,8 +158,8 @@ public class Robo {
 
     //static final int goal_x = 200;
     //static final int goal_y = 490;
-    static final int goal_x = 400;
-    static final int goal_y = 300;
+    static final int goal_x = 450;
+    static final int goal_y = 450;
 
     static {
         //RobotContext.showNavigationBar();

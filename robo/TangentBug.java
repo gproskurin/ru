@@ -25,14 +25,17 @@ public class TangentBug implements IAlgorithm {
                 final TangentGraph tg = ScanAround(r, goalAbsoluteAngle); //absoluteAngle - not dependent on robots angle
                 final PolarTurn best = tg.GetBestRoute(new Point(r.get_x(), r.get_y()), r.get_angle(), goal);
                 if (best == null) {
-                    // TODO
-                    FollowWall(r);
+                    final Utils.FollowWallDirection fwd = tg.GetFollowWallDirection(r.get_x(), r.get_y(), goal_x, goal_y);
+                    FollowWall(r, fwd, goal_x, goal_y);
                 } else {
                     // move to the best node
+                    System.out.println("Moving to best node...");
                     MoveTo(r, best);
+                    System.out.println(" - Moved");
                 }
                 final int goalDist = Utils.GetDist(r.get_x(), r.get_y(), goal.x, goal.y);
                 if (tg.goalIsVisible(goalDist)) {
+                    System.out.println("Goal is visible");
                     break;
                 }
             }
@@ -54,17 +57,20 @@ public class TangentBug implements IAlgorithm {
     // return true if goal reached, false if obstacle occured
     private static boolean TillGoal(IRobot r, final Point goal)
     {
+        System.out.println("TillGoal...");
         final double angle = Utils.ComputeAngle(r.get_x(), r.get_y(), goal.x, goal.y); //find a direction where to turn. angle from robot to goal
         r.rotate(angle - r.get_angle());
         r.forward();
         while (true) {
             if (GoalReached(r, goal)) {
                 r.stop();
+                System.out.println(" - TillGoal: goal reached");
                 return true;
             }
             final int d = r.get_distance();
             if (d >= 0 && d <= NearObstacle) { //we reached an obstacle
                 r.stop();
+                System.out.println(" - TillGoal: obstacle");
                 return false;
             }
             Tools.delay(10);  //small delay to relax
@@ -74,6 +80,7 @@ public class TangentBug implements IAlgorithm {
     // scan around and create tangent graph
     // while scanning, save distance in goal's direction
     private static TangentGraph ScanAround(IRobot r, double goalAbsoluteAngle) {
+        System.out.println("ScanAround: start...");
         TangentGraph tg = new TangentBug.TangentGraph(goalAbsoluteAngle);
 
         final double robot_angle = r.get_angle();
@@ -91,16 +98,17 @@ public class TangentBug implements IAlgorithm {
             Tools.delay(10); //100 раз в секунду снятие показаний
         }
         r.stop();
-        Tools.delay(1000); //
         //tg.Visit(r.GetDistance(), 360);
         tg.Finish();
 
+        System.out.println(" - ScanAround: end");
+        Tools.delay(1000); //
         return tg;
     }
 
-    private static void FollowWall(IRobot r) {
-        // TODO
-        //r.rotate();
+    private static void FollowWall(IRobot r, Utils.FollowWallDirection fwd, int goal_x, int goal_y) {
+        IAlgorithm wf = new WallFollower(fwd);
+        wf.run(r, goal_x, goal_y);
     }
 
     static class TangentGraph {
@@ -212,6 +220,23 @@ public class TangentBug implements IAlgorithm {
             final int turnSign = Utils.isEven(bestIdx) ? -1 : 1;
 
             return new PolarTurn(Nodes.get(bestIdx), turnSign);
+        }
+
+        Utils.FollowWallDirection GetFollowWallDirection(int robo_x, int robo_y, int goal_x, int goal_y) {
+            if (Nodes.isEmpty())
+                return null;
+            assert Nodes.size() >= 2;
+            final Polar p1 = Nodes.get(0);
+            final Polar p2 = Nodes.get(1);
+            final Point p1_dec = Utils.DecartFromPoint(robo_x, robo_y, p1);
+            final Point p2_dec = Utils.DecartFromPoint(robo_x, robo_y, p2);
+            final int dist_goal_1 = Utils.GetDist(goal_x, goal_y, p1_dec);
+            final int dist_goal_2 = Utils.GetDist(goal_x, goal_y, p2_dec);
+            final boolean wallOnTheRight = dist_goal_1 > dist_goal_2;
+            double sector_angle = Utils.ComputeAngle(p1_dec.x, p1_dec.y, p2_dec.x, p2_dec.y);
+            if (!wallOnTheRight)
+                sector_angle += Math.PI;
+            return new FollowWallDirection(wallOnTheRight, sector_angle);
         }
 
         private static Polar getBestAngleApprox(Polar currentBest, double goalAngle, int sampleDist, double sampleAngle) {
