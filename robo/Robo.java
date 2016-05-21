@@ -140,13 +140,14 @@ public class Robo {
 
     private static void addObstacles() {
         Point mesh1[] = {
-            new Point(-100, -50),
-            new Point(-100, 50),
-            new Point(100, 50),
-            new Point(100, -50)
+            new Point(-120, -30),
+            new Point(-120, 30),
+            new Point(120, 30),
+            new Point(120, -30)
         };
-        RobotContext.useTarget(bar(200, 100, Color.red), mesh1, 250, 250);
+        RobotContext.useTarget(bar(240, 60, Color.red), mesh1, 250, 250);
 
+        /*
         Point mesh2[] = {
             new Point(-20, -20),
             new Point(-20, 20),
@@ -154,6 +155,15 @@ public class Robo {
             new Point(20, -20)
         };
         RobotContext.useTarget(bar(40, 40, Color.red), mesh2, 400, 50);
+        */
+
+        Point mesh3[] = {
+            new Point(-20, -100),
+            new Point(-20, 100),
+            new Point(20, 100),
+            new Point(20, -100)
+        };
+        RobotContext.useTarget(bar(40, 200, Color.red), mesh3, 300, 150);
     }
 
     //static final int goal_x = 200;

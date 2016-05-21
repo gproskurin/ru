@@ -80,4 +80,14 @@ public class Utils {
     static double ComputeAngle(int x1, int y1, int x2, int y2) {
         return Math.atan2((double)(y2 - y1), (double)(x2 - x1));
     }
+
+    static double deg2rad(int deg)
+    {
+        return Math.PI / 180 * deg;
+    }
+
+    static int rad2deg(double rad)
+    {
+        return (int) (rad / Math.PI * 180);
+    }
 }
