@@ -55,7 +55,7 @@ public class TangentBug implements IAlgorithm {
     private static boolean TillGoal(IRobot r, final Point goal)
     {
         final double angle = Utils.ComputeAngle(r.get_x(), r.get_y(), goal.x, goal.y); //find a direction where to turn. angle from robot to goal
-        r.rotate(angle);
+        r.rotate(angle - r.get_angle());
         r.forward();
         while (true) {
             if (GoalReached(r, goal)) {
