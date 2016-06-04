@@ -9,9 +9,9 @@ import org.junit.Test;
 import static org.junit.Assert.*;
 import robo.Utils.Polar;
 
-public class TangentBugTest {
+public class TangentGraphTest {
 
-    public TangentBugTest() {
+    public TangentGraphTest() {
     }
 
     @BeforeClass
@@ -30,9 +30,21 @@ public class TangentBugTest {
     public void tearDown() {
     }
 
+    static private TangentGraph CreateTangentGraph()
+    {
+        return new TangentGraph(0, 0, 1, 1);
+    }
+
+    static private TangentGraph CreateTangentGraph(double goal_angle)
+    {
+        final int goal_x = 1000000;
+        final int goal_y = (int) ((double) goal_x * Math.tan(goal_angle));
+        return new TangentGraph(0, 0, goal_x, goal_y);
+    }
+
     @Test
     public void testVisitFinish1() {
-        TangentBug.TangentGraph tg = new TangentBug.TangentGraph(0);
+        TangentGraph tg = CreateTangentGraph();
         tg.AddSensorSample(1, 0.1);
         tg.AddSensorSample(2, 0.2);
         tg.AddSensorSample(3, 0.3);
@@ -47,12 +59,11 @@ public class TangentBugTest {
 
     @Test
     public void testVisitFinish2() {
-        TangentBug.TangentGraph tg = new TangentBug.TangentGraph(0);
+        TangentGraph tg = CreateTangentGraph();
         tg.AddSensorSample(1, 0.1);
         tg.AddSensorSample(2, 0.2);
         tg.AddSensorSample(3, 0.3);
         tg.AddSensorSample(-1, 0.4);
-        //tg.Visit(-1, 0.5);
         tg.AddSensorSample(4, 0.6);
         tg.AddSensorSample(5, 0.7);
         tg.AddSensorSample(6, 0.8);
@@ -68,7 +79,7 @@ public class TangentBugTest {
 
     @Test
     public void testVisitFinish3() {
-        TangentBug.TangentGraph tg = new TangentBug.TangentGraph(0);
+        TangentGraph tg = CreateTangentGraph();
         tg.AddSensorSample(1, 0.1); // end of sector
         tg.AddSensorSample(-1, 0.2);
         tg.AddSensorSample(-1, 0.3);
@@ -83,7 +94,7 @@ public class TangentBugTest {
 
     @Test
     public void testVisitFinish4() {
-        TangentBug.TangentGraph tg = new TangentBug.TangentGraph(0);
+        TangentGraph tg = CreateTangentGraph();
         tg.AddSensorSample(1, 0.1);
         tg.AddSensorSample(2, 0.15); // end of sector
         tg.AddSensorSample(-1, 0.2);
@@ -99,7 +110,7 @@ public class TangentBugTest {
 
     @Test
     public void testVisitFinish5() {
-        TangentBug.TangentGraph tg = new TangentBug.TangentGraph(0);
+        TangentGraph tg = CreateTangentGraph();
         tg.AddSensorSample(-1, 0.05);
         tg.AddSensorSample(1, 0.1);
         tg.AddSensorSample(2, 0.15);
@@ -118,7 +129,7 @@ public class TangentBugTest {
 
     @Test
     public void testVisitFinish_goalVisible1() {
-        TangentBug.TangentGraph tg = new TangentBug.TangentGraph(0.11);
+        TangentGraph tg = CreateTangentGraph(0.11);
         tg.AddSensorSample(10, 0.1);
         tg.AddSensorSample(20, 0.2);
         tg.AddSensorSample(-1, 0.25);
@@ -138,7 +149,7 @@ public class TangentBugTest {
 
     @Test
     public void testVisitFinish_goalVisible2() {
-        TangentBug.TangentGraph tg = new TangentBug.TangentGraph(0.26);
+        TangentGraph tg = CreateTangentGraph(0.26);
         tg.AddSensorSample(10, 0.1);
         tg.AddSensorSample(20, 0.2);
         tg.AddSensorSample(-1, 0.25);

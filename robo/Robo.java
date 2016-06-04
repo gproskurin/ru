@@ -13,7 +13,7 @@ public class Robo {
             params = new IRobot.Params();
             params.RobotSize = 10; // safety interval from center of robot to obstacles. In order to take robot size into account
                                               //FOR correction of movement (for the function to correct movement)
-            params.OneTurnTime = 2190; //simulator has a lack - robot can't turn on certain angle. 2 secs - turnes around
+            params.OneTurnTime = 2180; //simulator has a lack - robot can't turn on certain angle. 2 secs - turnes around
         }
 
         @Override
@@ -129,7 +129,7 @@ public class Robo {
 
     public static void main(String[] args) {
         try {
-            final IRobot r = new Robot(20, 20);  // parameters - corrdinates  x,y
+            final IRobot r = new Robot(170, 20);  // parameters - corrdinates  x,y
             Tools.delay(1000); //wait a second just to see how algorithm works (function from simulator)
             final IAlgorithm tb = new TangentBug();
             tb.run(r, goal_x, goal_y);
@@ -140,36 +140,42 @@ public class Robo {
 
     private static void addObstacles() {
         Point mesh1[] = {
-            new Point(-120, -30),
-            new Point(-120, 30),
-            new Point(120, 30),
-            new Point(120, -30)
+            new Point(-20, -50),
+            new Point(-20, 50),
+            new Point(20, 50),
+            new Point(20, -50)
         };
-        RobotContext.useTarget(bar(240, 60, Color.red), mesh1, 250, 250);
+        RobotContext.useTarget(bar(40, 100, Color.blue), mesh1, 150, 190);
 
-        /*
         Point mesh2[] = {
+            new Point(-120, -20),
+            new Point(-120, 20),
+            new Point(120, 20),
+            new Point(120, -20)
+        };
+        RobotContext.useTarget(bar(240, 40, Color.green), mesh2, 250, 250);
+
+        Point mesh3[] = {
+            new Point(-20, -80),
+            new Point(-20, 80),
+            new Point(20, 80),
+            new Point(20, -80)
+        };
+        RobotContext.useTarget(bar(40, 160, Color.red), mesh3, 350, 150);
+
+        Point mesh4[] = {
             new Point(-20, -20),
             new Point(-20, 20),
             new Point(20, 20),
             new Point(20, -20)
         };
-        RobotContext.useTarget(bar(40, 40, Color.red), mesh2, 400, 50);
-        */
-
-        Point mesh3[] = {
-            new Point(-20, -100),
-            new Point(-20, 100),
-            new Point(20, 100),
-            new Point(20, -100)
-        };
-        RobotContext.useTarget(bar(40, 200, Color.red), mesh3, 300, 150);
+        RobotContext.useTarget(bar(40, 40, Color.cyan), mesh4, 190, 390);
     }
 
-    //static final int goal_x = 200;
-    //static final int goal_y = 490;
-    static final int goal_x = 450;
-    static final int goal_y = 450;
+    static final int goal_x = 280;
+    static final int goal_y = 430;
+    //static final int goal_x = 450;
+    //static final int goal_y = 450;
 
     static {
         //RobotContext.showNavigationBar();
