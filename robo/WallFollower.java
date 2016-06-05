@@ -1,6 +1,8 @@
 package robo;
 
 import java.awt.Point;
+import robo.Interfaces.IAlgorithm;
+import robo.Interfaces.IRobot;
 
 /*
 Алгоритм:

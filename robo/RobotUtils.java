@@ -2,6 +2,7 @@ package robo;
 
 import ch.aplu.robotsim.Tools;
 import java.awt.Point;
+import robo.Interfaces.IRobot;
 
 public class RobotUtils {
 
@@ -66,13 +67,5 @@ public class RobotUtils {
 
     static private boolean GoalReached(IRobot r, final Point goal, int nearGoalDist) {
         return Utils.GetDist(r.get_x(),r.get_y(), goal.x, goal.y) <= nearGoalDist;
-    }
-
-    static int DistAngle(IRobot r, double absoluteAngle) {
-        final double rot_angle = absoluteAngle - r.get_angle();
-        r.rotate(rot_angle);
-        final int dist = r.get_distance();
-        r.rotate(-rot_angle);
-        return dist;
     }
 }
