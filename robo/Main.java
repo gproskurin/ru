@@ -20,38 +20,40 @@ public class Main {
         }
     }
 
+    // (x,y) is upper left point
+    // dx, dy are sizes
+    private static void addObstacleBar(int x, int y, int dx, int dy, Color color) {
+        if (!Utils.isEven(dx))
+            ++dx;
+        if (!Utils.isEven(dy))
+            ++dy;
+        final int half_x = dx / 2;
+        final int half_y = dy / 2;
+        final int center_x = x + half_x;
+        final int center_y = y + half_y;
+
+        Point mesh[] = {
+            new Point(-half_x, -half_y),
+            new Point(-half_x,  half_y),
+            new Point( half_x,  half_y),
+            new Point( half_x, -half_y)
+        };
+        RobotContext.useTarget(bar(dx, dy, color), mesh, center_x, center_y);
+    }
+
     private static void addObstacles() {
-        Point mesh1[] = {
-            new Point(-20, -50),
-            new Point(-20, 50),
-            new Point(20, 50),
-            new Point(20, -50)
-        };
-        RobotContext.useTarget(bar(40, 100, Color.blue), mesh1, 150, 190);
+        // U
+        if (false) {
+            addObstacleBar(130, 140, 40, 100, Color.blue);
+            addObstacleBar(130, 230, 240, 40, Color.green);
+            addObstacleBar(330, 70, 40, 160,Color.red);
+        }
 
-        Point mesh2[] = {
-            new Point(-120, -20),
-            new Point(-120, 20),
-            new Point(120, 20),
-            new Point(120, -20)
-        };
-        RobotContext.useTarget(bar(240, 40, Color.green), mesh2, 250, 250);
-
-        Point mesh3[] = {
-            new Point(-20, -80),
-            new Point(-20, 80),
-            new Point(20, 80),
-            new Point(20, -80)
-        };
-        RobotContext.useTarget(bar(40, 160, Color.red), mesh3, 350, 150);
-
-        Point mesh4[] = {
-            new Point(-20, -20),
-            new Point(-20, 20),
-            new Point(20, 20),
-            new Point(20, -20)
-        };
-        RobotContext.useTarget(bar(40, 40, Color.cyan), mesh4, 190, 390);
+        // Plus
+        if (true) {
+            addObstacleBar(250, 120, 20, 280, Color.red);
+            addObstacleBar(120, 240, 300, 20, Color.green);
+        }
     }
 
     static final int goal_x = 280;
