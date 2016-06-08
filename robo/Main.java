@@ -43,34 +43,36 @@ public class Main {
 
     private static void addObstacles() {
         // U
-        if (false) {
+        if (true) {
             addObstacleBar(130, 140, 40, 100, Color.blue);
             addObstacleBar(130, 230, 240, 40, Color.green);
             addObstacleBar(330, 70, 40, 160,Color.red);
         }
 
         // Plus
-        if (true) {
+        if (false) {
             addObstacleBar(250, 120, 20, 280, Color.red);
             addObstacleBar(120, 240, 300, 20, Color.green);
+        }
+
+        // Square circle around obstacle
+        if (false) {
+            addObstacleBar(150, 150, 20, 200, Color.blue);
+            addObstacleBar(150, 150, 200, 20, Color.yellow);
+            addObstacleBar(350, 150, 20, 200, Color.green);
+            addObstacleBar(150, 350, 220, 20, Color.cyan);
         }
     }
 
     static final int goal_x = 280;
     static final int goal_y = 430;
-    //static final int goal_x = 450;
-    //static final int goal_y = 450;
+
+    // Goal is in the center (for sqare circle obstacle)
+    //static final int goal_x = 250;
+    //static final int goal_y = 250;
 
     static {
-        //RobotContext.showNavigationBar();
-
         addObstacles();
-
-        //RobotContext.useObstacle(bar(200, 100, Color.red), 250, 250);
-        //RobotContext.useTarget(bar(200, 100, Color.red), 250, 250);
-        //RobotContext.useObstacle(bar(300, 20, Color.green), 250, 350);
-        //RobotContext.useObstacle(bar(20, 300, Color.blue), 150, 250);
-        //RobotContext.useObstacle(bar(20, 300, Color.yellow), 350, 250);
         RobotContext.useObstacle(circle(5, Color.black), goal_x, goal_y); //draw a black small circle on a TARGET
     }
 
@@ -81,7 +83,6 @@ public class Main {
         bm.drawCircle(new Point(radius, radius), radius - 1);
         return bm;
     }
-
 
     //прямоугольник
     private static GGBitmap bar(int width, int length, Color color) {
