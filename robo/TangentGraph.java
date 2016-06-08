@@ -51,23 +51,23 @@ public class TangentGraph {
             return;
         }
 
+        final Utils.Polar polar = new Utils.Polar(dist, absoluteAngle);
+
         // calculate dReach
         dReach = Math.min(
                 dReach,
                 Utils.GetDist(
                         goal_x,
                         goal_y,
-                        Utils.DecartFromPoint(robo_x, robo_y, new Utils.Polar(dist, absoluteAngle))
+                        Utils.DecartFromPoint(robo_x, robo_y, polar)
                 )
         );
-
-        final Utils.Polar p = new Utils.Polar(dist, absoluteAngle);
 
         if (!insideSector || !Utils.isEven(Nodes.size())) {
             // begin of new sector OR second point of last sector
             // just append it
             //assert Utils.isEven(Nodes.size());
-            Nodes.add(p);
+            Nodes.add(polar);
             insideSector = true;
             return;
         }
@@ -75,7 +75,7 @@ public class TangentGraph {
         // third point of current sector, replace last point
         assert !Nodes.isEmpty();
         assert Utils.isEven(Nodes.size());
-        Nodes.set(Nodes.size() - 1, p);
+        Nodes.set(Nodes.size() - 1, polar);
     }
 
     void Finish() {
@@ -174,7 +174,10 @@ public class TangentGraph {
             final Utils.Polar end = Nodes.get(i + 1);
             assert begin.angle <= end.angle;
             if (begin.angle <= goalSample.angle && goalSample.angle <= end.angle) {
-                return (goalSample.distance >= goalDist);
+                final boolean visible = (goalSample.distance >= goalDist);
+                if (visible)
+                    System.out.println("visible: "+begin.angle+" <= "+goalSample.angle+" <= "+end.angle);
+                return visible;
             }
         }
         return true;

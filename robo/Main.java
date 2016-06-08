@@ -91,6 +91,10 @@ public class Main {
             addObstacleBar(350, 150, 20, 200, Color.green);
             addObstacleBar(150, 350, 220, 20, Color.cyan);
         }
+
+        if (false) {
+            addObstacleBar(150, 240, 200, 20, Color.green);
+        }
     }
 
     static final int goal_x = 280;

@@ -17,11 +17,11 @@ import robo.Interfaces.IRobot;
 public class WallFollower implements IAlgorithm {
     private final Utils.FollowWallDirection Fwd;
     private int dFollowed = Integer.MAX_VALUE;
-    final int dReach;
+    private final int dReach;
 
-    Point Start = null; // точка, с которой начали следование вдоль стены
-    final int start_diff = 20; // погрешность определения координат при зацикливании
-    final int loop_step = 5; // после скольки перемещений определять зацикливание
+    private Point Start = null; // точка, с которой начали следование вдоль стены
+    private final int start_diff = 20; // погрешность определения координат при зацикливании
+    private final int loop_step = 5; // после скольки перемещений определять зацикливание
 
     WallFollower(Utils.FollowWallDirection fwd, int dReach) {
         Fwd = fwd;

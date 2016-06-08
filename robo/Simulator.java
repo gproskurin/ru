@@ -11,9 +11,8 @@ Simulator-specific implementations of some interfaces
 public class Simulator {
 
     static class Robot implements IRobot {
-        private IRobot.Params params;
-
-        private void init_params() {
+        private final IRobot.Params params;
+        {
             params = new IRobot.Params();
             params.RobotSize = 10; // safety interval from center of robot to obstacles. In order to take robot size into account
             //FOR correction of movement (for the function to correct movement)
@@ -27,9 +26,9 @@ public class Simulator {
         private static int Speed = -1; // units/second   units are coordinates X and Y on the screen.
         //Присваевается значение после выполнения функции calibrate speed
 
-        private Gear gear;
-        private UltrasonicSensor sensor;
-        private LegoRobot robot;
+        private final Gear gear;
+        private final UltrasonicSensor sensor;
+        private final LegoRobot robot;
 
         private double angle = 0;  //current angle of robot
 
@@ -115,8 +114,6 @@ public class Simulator {
 
         // constructor. Robot is constructed and placed in the point with coordinates (x,y)
         Robot(int x, int y) {
-            init_params();
-
             RobotContext.setStartPosition(x, y); //Robot.Context - simulator class with static functions for environmemt
             angle = 0;
             RobotContext.setStartDirection(0); //setStartDirect - which direction to orientate robot
