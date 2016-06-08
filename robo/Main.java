@@ -9,12 +9,41 @@ import robo.Interfaces.IRobot;
 
 public class Main {
 
+    static class Strategy_TangentBug implements Interfaces.IStrategy {
+        final IRobot robot;
+        final int goal_x;
+        final int goal_y;
+
+        Strategy_TangentBug(IRobot r, int goal_x, int goal_y) {
+            robot = r;
+            this.goal_x = goal_x;
+            this.goal_y = goal_y;
+        }
+
+        @Override
+        public boolean run() {
+            final Interfaces.IAlgorithm tb = new TangentBug();
+            final boolean tbSuccess = tb.run(robot, goal_x, goal_y);
+            if (tbSuccess) {
+                System.out.println("TangentBug SUCCESS");
+            } else {
+                System.out.println("TangentBug FAILURE");
+            }
+            return tbSuccess;
+        }
+    }
+
     public static void main(String[] args) {
         try {
             final IRobot r = new Simulator.Robot(170, 20);  // parameters - corrdinates  x,y
             Tools.delay(1000); //wait a second just to see how algorithm works (function from simulator)
-            Interfaces.IStrategy strategy = new Simulator.Strategy_TangentBug(r, goal_x, goal_y);
-            strategy.run();
+            Interfaces.IStrategy strategy = new Strategy_TangentBug(r, goal_x, goal_y);
+            boolean success = strategy.run();
+            if (success) {
+                System.out.println("IStrategy SUCCESS");
+            } else {
+                System.out.println("IStrategy FAILURE");
+            }
         } catch (Exception ex) {
             System.out.println("Exception: " + ex);
         }

@@ -3,30 +3,13 @@ package robo;
 import ch.aplu.robotsim.*;
 import java.awt.Color;
 import robo.Interfaces.IRobot;
-import robo.Interfaces.IStrategy;
-import robo.Interfaces.IAlgorithm;
+
+/*
+Simulator-specific implementations of some interfaces
+*/
 
 public class Simulator {
 
-    static class Strategy_TangentBug implements IStrategy {
-        final IRobot robot;
-        final int goal_x;
-        final int goal_y;
-
-        Strategy_TangentBug(IRobot r, int goal_x, int goal_y) {
-            robot = r;
-            this.goal_x = goal_x;
-            this.goal_y = goal_y;
-        }
-
-        @Override
-        public void run() {
-            final IAlgorithm tb = new TangentBug();
-            tb.run(robot, goal_x, goal_y);
-        }
-    }
-
-    
     static class Robot implements IRobot {
         private IRobot.Params params;
 

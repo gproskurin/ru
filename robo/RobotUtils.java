@@ -50,7 +50,7 @@ public class RobotUtils {
         r.rotate(angle - r.get_angle());
         r.forward();
         while (true) {
-            if (GoalReached(r, goal, nearGoalDist)) {
+            if (PointReached(r, goal, nearGoalDist)) {
                 r.stop();
                 System.out.println(" - TillGoal: goal reached");
                 return true;
@@ -65,7 +65,7 @@ public class RobotUtils {
         }
     }
 
-    static private boolean GoalReached(IRobot r, final Point goal, int nearGoalDist) {
-        return Utils.GetDist(r.get_x(),r.get_y(), goal.x, goal.y) <= nearGoalDist;
+    static boolean PointReached(IRobot r, final Point goal, int nearDist) {
+        return Utils.GetDist(r.get_x(),r.get_y(), goal.x, goal.y) <= nearDist;
     }
 }

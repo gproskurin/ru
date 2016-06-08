@@ -10,22 +10,29 @@ public class TangentBug implements IAlgorithm {
     static private final int NearGoal = 50; //to enlarge goal influence
 
     @Override
-    public void run(IRobot r, int goal_x, int goal_y) {
+    public boolean run(IRobot r, int goal_x, int goal_y) {
         final Point goal = new Point(goal_x, goal_y);
 
         while (true) {
             if (RobotUtils.TillGoal(r, goal, NearObstacle, NearGoal)) {
                 // goal reached
-                return;
+                return true;
             }
 
-            TangentGraph tg = null;
             while (true) {
-                boolean afterWallFollow = false;
-                if (!afterWallFollow)
-                    tg = RobotUtils.ScanAround(r, goal_x, goal_y);
+                final TangentGraph tg = RobotUtils.ScanAround(r, goal_x, goal_y);
+
+                final int goalDist = Utils.GetDist(r.get_x(), r.get_y(), goal.x, goal.y);
+                if (tg.goalIsVisible(goalDist)) {
+                    System.out.println("Goal is visible");
+                    break;
+                }
+
+                System.out.println("Goal is NOT visible");
+
                 final PolarTurn best = tg.GetBestRoute(new Point(r.get_x(), r.get_y()), r.get_angle(), goal);
                 if (best == null) {
+                    // No best node, start following wall
                     final Utils.FollowWallDirection fwd = tg.GetFollowWallDirection(
                             r.get_x(),
                             r.get_y(),
@@ -33,30 +40,24 @@ public class TangentBug implements IAlgorithm {
                             goal_x,
                             goal_y
                     );
-                    FollowWall(r, fwd, tg.dReach, goal_x, goal_y);
-                    tg = RobotUtils.ScanAround(r, goal_x, goal_y);
-                    afterWallFollow = true;
+                    final boolean followWallSuccess = FollowWall(r, fwd, tg.dReach, goal_x, goal_y);
+                    if (!followWallSuccess) {
+                        System.out.println("FollowWall FAILURE (loop)");
+                        return false; // loop detected
+                    }
+                    System.out.println("FollowWall SUCCESS");
                 } else {
                     // move to the best node
                     System.out.println("Moving to best node...");
                     RobotUtils.MoveTo(r, best);
                     System.out.println(" - Moved");
                 }
-                final int goalDist = Utils.GetDist(r.get_x(), r.get_y(), goal.x, goal.y);
-                if (tg.goalIsVisible(goalDist)) {
-                    System.out.println("Goal is visible");
-                    break;
-                } else {
-                    System.out.println("Goal is NOT visible");
-                }
-                tg = null;
             }
         }
     }
 
-    private static void FollowWall(IRobot r, Utils.FollowWallDirection fwd, int dReach, int goal_x, int goal_y) {
+    private static boolean FollowWall(IRobot r, Utils.FollowWallDirection fwd, int dReach, int goal_x, int goal_y) {
         IAlgorithm wf = new WallFollower(fwd, dReach);
-        wf.run(r, goal_x, goal_y);
+        return wf.run(r, goal_x, goal_y);
     }
-
 }

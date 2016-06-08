@@ -3,12 +3,12 @@ package robo;
 public class Interfaces {
 
     public interface IStrategy {
-        void run();
+        boolean run(); // returns true on success
     }
 
 
     public interface IAlgorithm {
-        void run(IRobot r, int goal_x, int goal_y);
+        boolean run(IRobot r, int goal_x, int goal_y);// returns true on success
     }
 
 

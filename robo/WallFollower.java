@@ -19,6 +19,10 @@ public class WallFollower implements IAlgorithm {
     private int dFollowed = Integer.MAX_VALUE;
     final int dReach;
 
+    Point Start = null; // точка, с которой начали следование вдоль стены
+    final int start_diff = 20; // погрешность определения координат при зацикливании
+    final int loop_step = 5; // после скольки перемещений определять зацикливание
+
     WallFollower(Utils.FollowWallDirection fwd, int dReach) {
         Fwd = fwd;
         this.dReach = dReach;
@@ -58,14 +62,21 @@ public class WallFollower implements IAlgorithm {
     }
 
     @Override
-    public void run(IRobot r, int goal_x, int goal_y) {
+    public boolean run(IRobot r, int goal_x, int goal_y) {
+        Start = new Point(r.get_x(), r.get_y());
         boolean first = true;
+        int step_number = 0;
         while (true) {
             final int next_step_size = check_wall_distance_and_correct(r, first, goal_x, goal_y);
+            ++step_number;
             System.out.println("dFollowed:"+dFollowed+" dReach:"+dReach);
             if (dFollowed < dReach) {
-                System.out.println("WallFollow END");
-                return;
+                // success
+                return true;
+            }
+            if (step_number > loop_step && RobotUtils.PointReached(r, Start, start_diff)) {
+                // loop
+                return false;
             }
             r.forward(next_step_size);
             first = false;
