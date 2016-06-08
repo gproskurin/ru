@@ -7,7 +7,7 @@ import robo.Utils.PolarTurn;
 
 public class TangentBug implements IAlgorithm {
     static private final int NearObstacle = 70; //while moving forward - when robot see obstacle and estimated distance is less then 80, it stops
-    static private final int NearGoal = 70; //to enlarge goal influence
+    static private final int NearGoal = 50; //to enlarge goal influence
 
     @Override
     public void run(IRobot r, int goal_x, int goal_y) {
