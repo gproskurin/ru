@@ -30,7 +30,7 @@ public class TangentBug implements IAlgorithm {
 
                 System.out.println("Goal is NOT visible");
 
-                final PolarTurn best = tg.GetBestRoute(new Point(r.get_x(), r.get_y()), r.get_angle(), goal);
+                final PolarTurn best = tg.GetBestRoute(new Point(r.get_x(), r.get_y()), goal);
                 if (best == null) {
                     // No best node, start following wall
                     final Utils.FollowWallDirection fwd = tg.GetFollowWallDirection(

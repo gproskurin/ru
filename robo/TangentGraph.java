@@ -99,7 +99,7 @@ public class TangentGraph {
     }
 
     // searches tangent graph. returns null if local minima
-    Utils.PolarTurn GetBestRoute(Point robo, double robo_angle, Point goal) {
+    Utils.PolarTurn GetBestRoute(Point robo, Point goal) {
         assert !Nodes.isEmpty();
         final int dRoboGoal = Utils.GetDist(robo, goal);
         boolean localMin = true;
