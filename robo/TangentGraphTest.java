@@ -43,7 +43,7 @@ public class TangentGraphTest {
     }
 
     @Test
-    public void testVisitFinish1() {
+    public void testAddSensorSample1() {
         TangentGraph tg = CreateTangentGraph();
         tg.AddSensorSample(1, 0.1);
         tg.AddSensorSample(2, 0.2);
@@ -58,7 +58,7 @@ public class TangentGraphTest {
     }
 
     @Test
-    public void testVisitFinish2() {
+    public void testAddSensorSample2() {
         TangentGraph tg = CreateTangentGraph();
         tg.AddSensorSample(1, 0.1);
         tg.AddSensorSample(2, 0.2);
@@ -78,7 +78,7 @@ public class TangentGraphTest {
     }
 
     @Test
-    public void testVisitFinish3() {
+    public void testAddSensorSample3() {
         TangentGraph tg = CreateTangentGraph();
         tg.AddSensorSample(1, 0.1); // end of sector
         tg.AddSensorSample(-1, 0.2);
@@ -93,7 +93,7 @@ public class TangentGraphTest {
     }
 
     @Test
-    public void testVisitFinish4() {
+    public void testAddSensorSample4() {
         TangentGraph tg = CreateTangentGraph();
         tg.AddSensorSample(1, 0.1);
         tg.AddSensorSample(2, 0.15); // end of sector
@@ -109,7 +109,7 @@ public class TangentGraphTest {
     }
 
     @Test
-    public void testVisitFinish5() {
+    public void testAddSensorSample5() {
         TangentGraph tg = CreateTangentGraph();
         tg.AddSensorSample(-1, 0.05);
         tg.AddSensorSample(1, 0.1);
@@ -128,7 +128,7 @@ public class TangentGraphTest {
     }
 
     @Test
-    public void testVisitFinish_goalVisible1() {
+    public void testAddSensorSample_goalVisible1() {
         TangentGraph tg = CreateTangentGraph(0.11);
         tg.AddSensorSample(10, 0.1);
         tg.AddSensorSample(20, 0.2);
@@ -148,7 +148,7 @@ public class TangentGraphTest {
     }
 
     @Test
-    public void testVisitFinish_goalVisible2() {
+    public void testAddSensorSample_goalVisible2() {
         TangentGraph tg = CreateTangentGraph(0.26);
         tg.AddSensorSample(10, 0.1);
         tg.AddSensorSample(20, 0.2);
