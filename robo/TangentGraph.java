@@ -96,6 +96,7 @@ public class TangentGraph {
             Nodes.remove(Nodes.size() - 1);
             Nodes.remove(Nodes.size() - 1);
         }
+        PrintNodes();
     }
 
     // searches tangent graph. returns null if local minima
@@ -183,14 +184,12 @@ public class TangentGraph {
         return true;
     }
 
-    /*
-        private void PrintNodes() {
-            System.out.println("Nodes: ");
-            for (Polar p : Nodes) {
-                System.out.println("Dist:" + p.distance + " angle:" + p.angle + " deg:" + p.angle * 360 / 2 / Math.PI);
-            }
+    private void PrintNodes() {
+        System.out.println("Nodes: ");
+        for (Utils.Polar p : Nodes) {
+            System.out.println("Dist:" + p.distance + " angle:" + p.angle + " deg:" + Utils.rad2deg(p.angle));
         }
-     */
+    }
 
     // used for test
     ArrayList<Utils.Polar> GetNodes() {
