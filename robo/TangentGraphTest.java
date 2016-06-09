@@ -165,4 +165,23 @@ public class TangentGraphTest {
         assertTrue(nodes.get(3).distance==40);
         assertTrue(tg.goalIsVisible(1));
         assertTrue(tg.goalIsVisible(100));
-    }}
+    }
+
+    @Test
+    public void testAddSensorSample6() {
+        TangentGraph tg = CreateTangentGraph();
+        tg.AddSensorSample(1, 0.05);
+        tg.AddSensorSample(2, 0.1);
+        tg.AddSensorSample(101, 0.15);
+        tg.AddSensorSample(102, 0.2);
+        tg.AddSensorSample(-1, 0.9);
+        tg.Finish();
+        ArrayList<Polar> nodes = tg.GetNodes();
+        assertTrue(nodes.size()==4);
+        assertTrue(nodes.get(0).distance==1);
+        assertTrue(nodes.get(1).distance==2);
+        assertTrue(nodes.get(1).angle==nodes.get(2).angle);
+        assertTrue(nodes.get(2).distance==101);
+        assertTrue(nodes.get(3).distance==102);
+    }
+}

@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Optional;
 
 public class TangentGraph {
+    private static int dDist = 20;
     private final ArrayList<Utils.Polar> Nodes = new ArrayList<>();
     private Optional<Boolean> startedInsideSector = Optional.empty();
     private boolean insideSector = false;
@@ -72,10 +73,22 @@ public class TangentGraph {
             return;
         }
 
-        // third point of current sector, replace last point
+        // third point of current sector
         assert !Nodes.isEmpty();
         assert Utils.isEven(Nodes.size());
-        Nodes.set(Nodes.size() - 1, polar);
+
+        final Utils.Polar last = Nodes.get(Nodes.size() - 1);
+
+        if (Math.abs(last.distance - polar.distance) < dDist) {
+            // replace last point
+            Nodes.set(Nodes.size() - 1, polar);
+        } else {
+            final double new_angle = (last.angle + polar.angle) / 2;
+            last.angle = new_angle;
+            polar.angle = new_angle;
+            Nodes.add(polar);
+            assert insideSector;
+        }
     }
 
     void Finish() {
@@ -126,6 +139,15 @@ public class TangentGraph {
         if (localMin) {
             // local minimum detected, caller shuld switch to wal-following mode
             return null;
+        }
+
+        final int nearIdx = (Utils.isEven(bestIdx) ? bestIdx - 1 : bestIdx + 1);
+        if (nearIdx >= 0 && nearIdx< Nodes.size()) {
+            final Utils.Polar nearPolar = Nodes.get(nearIdx);
+            final Utils.Polar bestPolar = Nodes.get(bestIdx);
+            if (nearPolar.angle==bestPolar.angle && bestPolar.distance > nearPolar.distance) {
+                bestIdx = nearIdx;
+            }
         }
 
         // Used later to calculate angle correction. See ToRobotMotion() function for details.
