@@ -23,7 +23,7 @@ public class Simulator {
         public IRobot.Params get_params() {
             return params;
         }
-        private static int Speed = -1; // units/second   units are coordinates X and Y on the screen.
+        final private static int Speed = 50;//-1; // units/second   units are coordinates X and Y on the screen.
         //Присваевается значение после выполнения функции calibrate speed
 
         private final Gear gear;
@@ -94,6 +94,7 @@ public class Simulator {
             gear.forward();
         }
 
+        /*
         private void CalibrateSpeed() {  //to distinguish robot's speed. Robot moves for one second, knowing current postion and finish we can calculate speed
             final int time = 1000;
 
@@ -111,6 +112,7 @@ public class Simulator {
             final int dist = Utils.GetDist(begin_x, begin_y, end_x, end_y);
             Speed = dist;  //сколько юнитов прошли за секунду.
         }
+        */
 
         // constructor. Robot is constructed and placed in the point with coordinates (x,y)
         Robot(int x, int y) {
@@ -130,7 +132,7 @@ public class Simulator {
             robot.addPart(sensor);
 
             System.out.println("Calibrating speed...");
-            CalibrateSpeed();
+            //CalibrateSpeed();
             System.out.println(" - Calibrated, speed = " + Speed + " units/second");
         }
     }
