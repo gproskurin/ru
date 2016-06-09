@@ -83,6 +83,8 @@ public class TangentGraph {
             // replace last point
             Nodes.set(Nodes.size() - 1, polar);
         } else {
+            // overlapped obstacles detected
+            // store equal angle for adjacent samples as indication for overlapped obstacles
             final double new_angle = (last.angle + polar.angle) / 2;
             last.angle = new_angle;
             polar.angle = new_angle;
@@ -141,12 +143,20 @@ public class TangentGraph {
             return null;
         }
 
+        boolean cutDist = false;
+
+        // Test, whether best point has overlapping neighbour
         final int nearIdx = (Utils.isEven(bestIdx) ? bestIdx - 1 : bestIdx + 1);
-        if (nearIdx >= 0 && nearIdx< Nodes.size()) {
+        if (nearIdx >= 0 && nearIdx < Nodes.size()) {
             final Utils.Polar nearPolar = Nodes.get(nearIdx);
             final Utils.Polar bestPolar = Nodes.get(bestIdx);
-            if (nearPolar.angle==bestPolar.angle && bestPolar.distance > nearPolar.distance) {
+            final boolean overlap = (nearPolar.angle == bestPolar.angle);
+            if (overlap && bestPolar.distance > nearPolar.distance) {
+                // If best node has overlapping neighbour and more far then this neighbour,
+                // move to closer neighbour instead
                 bestIdx = nearIdx;
+                cutDist = true; // do not add roboSize to distance in ToTobotMotion
+                //System.out.println("Applying MIST");
             }
         }
 
@@ -155,7 +165,8 @@ public class TangentGraph {
         // Odd index means end of obstacle sector, angle correction should be positive
         final int turnSign = Utils.isEven(bestIdx) ? -1 : 1;
 
-        return new Utils.PolarTurn(Nodes.get(bestIdx), turnSign);
+        final Utils.PolarTurn turn = new Utils.PolarTurn(Nodes.get(bestIdx), turnSign, cutDist);
+        return turn;
     }
 
     Utils.FollowWallDirection GetFollowWallDirection(int robo_x, int robo_y, int goal_x, int goal_y) {

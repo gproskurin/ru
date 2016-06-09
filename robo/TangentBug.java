@@ -48,7 +48,7 @@ public class TangentBug implements IAlgorithm {
                     System.out.println("FollowWall SUCCESS");
                 } else {
                     // move to the best node
-                    System.out.println("Moving to best node...");
+                    System.out.println("Moving to best node: dist:"+best.polar.distance+" angle:"+best.polar.angle+" deg:"+Utils.rad2deg(best.polar.angle)+" cut_dist:"+best.cutDist);
                     RobotUtils.MoveTo(r, best);
                     System.out.println(" - Moved");
                 }
