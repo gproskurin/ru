@@ -35,7 +35,7 @@ public class Main {
 
     public static void main(String[] args) {
         try {
-            final IRobot r = new Simulator.Robot(170, 20);  // parameters - corrdinates  x,y
+            final IRobot r = new Simulator.Robot(250,300);  // parameters - corrdinates  x,y  170,20  250,300 300,20
             Tools.delay(1000); //wait a second just to see how algorithm works (function from simulator)
             Interfaces.IStrategy strategy = new Strategy_TangentBug(r, goal_x, goal_y);
             boolean success = strategy.run();
@@ -72,7 +72,7 @@ public class Main {
 
     private static void addObstacles() {
         // U
-        if (true) {
+        if (false) {
             addObstacleBar(130, 140, 40, 100, Color.blue);
             addObstacleBar(130, 230, 240, 40, Color.green);
             addObstacleBar(330, 70, 40, 160,Color.red);
@@ -92,17 +92,52 @@ public class Main {
             addObstacleBar(150, 350, 220, 20, Color.cyan);
         }
 
+        //Horizontal
         if (false) {
             addObstacleBar(150, 240, 200, 20, Color.green);
         }
+
+        //T-shape
+        if (false) {
+            addObstacleBar(250, 120, 20, 250, Color.blue);
+            addObstacleBar(120, 240, 150, 20, Color.blue);
+        }
+
+        //Lab1
+        if (false) {
+            addObstacleBar(0, 0, 20, 600, Color.CYAN);
+            addObstacleBar(0, 0, 600, 20, Color.CYAN);
+            addObstacleBar(480, 0, 20, 600, Color.CYAN);
+            addObstacleBar(0, 480, 600, 20, Color.CYAN);
+            addObstacleBar(20, 240, 300, 20, Color.CYAN);
+            addObstacleBar(100, 0, 20, 150, Color.CYAN);
+            addObstacleBar(100, 150, 200, 20, Color.CYAN);
+            //addObstacleBar(250, 75, 200, 20, Color.CYAN);
+            addObstacleBar(400, 150, 150, 20, Color.CYAN);
+            addObstacleBar(200, 350, 400, 20, Color.CYAN);
+        }
+
+        // Snail
+        if (true) {
+            addObstacleBar(100, 100, 20, 250, Color.MAGENTA); //left
+            addObstacleBar(100, 350, 200, 20, Color.MAGENTA); //нижняя
+            addObstacleBar(300, 220, 20, 150, Color.MAGENTA);
+            addObstacleBar(200, 220, 100, 20, Color.MAGENTA);
+            addObstacleBar(100, 100, 350, 20, Color.MAGENTA);
+            addObstacleBar(430, 100, 20, 300, Color.MAGENTA);
+        }
+
     }
 
-    static final int goal_x = 280;
-    static final int goal_y = 430;
+    //static final int goal_x = 280;
+    //static final int goal_y = 430;
 
     // Goal is in the center (for sqare circle obstacle)
     //static final int goal_x = 250;
     //static final int goal_y = 250;
+
+    static final int goal_x = 200;
+    static final int goal_y = 430;
 
     static {
         addObstacles();
