@@ -1,14 +1,14 @@
 package robo;
 
-import ch.aplu.robotsim.*; //simulator uses jgamegridlibrary + robot classes (sensors, motor)
+import ch.aplu.robotsim.*; //simulator uses jgamegrid library + robot classes (sensors, motor)
 import ch.aplu.jgamegrid.*; //java library for creating games http://www.aplu.ch/home/apluhomex.jsp?site=75
 import java.awt.Point;
 import java.awt.Color;
 import robo.Interfaces.IRobot;
 
-
 public class Main {
 
+    // IStrategy implementation, which uses tangent bug algorithm
     static class Strategy_TangentBug implements Interfaces.IStrategy {
         final IRobot robot;
         final int goal_x;
@@ -20,6 +20,7 @@ public class Main {
             this.goal_y = goal_y;
         }
 
+        // run tangent bug algorithm and return its result
         @Override
         public boolean run() {
             final Interfaces.IAlgorithm tb = new TangentBug();
@@ -35,7 +36,10 @@ public class Main {
 
     public static void main(String[] args) {
         try {
-            final IRobot r = new Simulator.Robot(250,300);  // parameters - corrdinates  x,y  170,20  250,300 300,20
+            // parameters - corrdinates  x,y  170,20  250,300 300,20
+            //final IRobot r = new Simulator.Robot(250,300); // for snail
+            final IRobot r = new Simulator.Robot(40,40); // for lab
+            //final IRobot r = new Simulator.Robot(250,300);
             Tools.delay(1000); //wait a second just to see how algorithm works (function from simulator)
             Interfaces.IStrategy strategy = new Strategy_TangentBug(r, goal_x, goal_y);
             boolean success = strategy.run();
@@ -104,7 +108,7 @@ public class Main {
         }
 
         //Lab1
-        if (false) {
+        if (true) {
             addObstacleBar(0, 0, 20, 600, Color.CYAN);
             addObstacleBar(0, 0, 600, 20, Color.CYAN);
             addObstacleBar(480, 0, 20, 600, Color.CYAN);
@@ -118,7 +122,7 @@ public class Main {
         }
 
         // Snail
-        if (true) {
+        if (false) {
             addObstacleBar(100, 100, 20, 250, Color.MAGENTA); //left
             addObstacleBar(100, 350, 200, 20, Color.MAGENTA); //нижняя
             addObstacleBar(300, 220, 20, 150, Color.MAGENTA);
@@ -129,15 +133,15 @@ public class Main {
 
     }
 
-    //static final int goal_x = 280;
-    //static final int goal_y = 430;
+    static final int goal_x = 280;
+    static final int goal_y = 430;
 
     // Goal is in the center (for sqare circle obstacle)
     //static final int goal_x = 250;
     //static final int goal_y = 250;
 
-    static final int goal_x = 200;
-    static final int goal_y = 430;
+    //static final int goal_x = 200;
+    //static final int goal_y = 430;
 
     static {
         addObstacles();

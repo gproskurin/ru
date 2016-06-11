@@ -11,12 +11,11 @@ public class Interfaces {
         boolean run(IRobot r, int goal_x, int goal_y);// returns true on success
     }
 
-
     public interface IRobot {
 
         static public class Params {
-            int RobotSize;
-            int OneTurnTime;
+            int RobotSize; // линейные размеры робота. Учитывается при коррекции движения
+            int OneTurnTime; // время полного оборота вокруг своей оси. Используется для вращения на заданный угол
         }
 
         Params get_params();
@@ -30,7 +29,7 @@ public class Interfaces {
         // rotate for specified angle and stop
         void rotate(double angle);
 
-        // start rotating
+        // start rotating (until stop() is called)
         void rotate();
 
         // stop rotating and moving
@@ -44,6 +43,7 @@ public class Interfaces {
         int get_x();
         int get_y();
 
+        // current angle of robot relative to coordinate axis
         double get_angle();
     }
 }
