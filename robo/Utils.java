@@ -14,8 +14,7 @@ public class Utils {
     static class PolarTurn {
         Polar polar;
         int turnSign; // {-1,+1}
-        boolean cutDist;
-        PolarTurn(Polar p, int sign, boolean cut) { polar=p; turnSign=sign; cutDist=cut; }
+        PolarTurn(Polar p, int sign) { polar=p; turnSign=sign; }
     }
 
     static class FollowWallDirection {
@@ -35,7 +34,7 @@ public class Utils {
         double angleCorrection = Math.asin((double)(roboSize*2)/(double)p.polar.distance);
         if (p.turnSign < 0)
             angleCorrection = -angleCorrection;
-        final int distCorrection = p.cutDist ? 0 : roboSize;
+        final int distCorrection = roboSize;
         return new Polar(p.polar.distance + distCorrection, p.polar.angle + angleCorrection);
     }
 

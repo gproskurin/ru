@@ -143,8 +143,6 @@ public class TangentGraph {
             return null;
         }
 
-        boolean cutDist = false;
-
         // Test, whether best point has overlapping neighbour
         final int nearIdx = (Utils.isEven(bestIdx) ? bestIdx - 1 : bestIdx + 1);
         if (nearIdx >= 0 && nearIdx < Nodes.size()) {
@@ -155,8 +153,6 @@ public class TangentGraph {
                 // If best node has overlapping neighbour and more far then this neighbour,
                 // move to closer neighbour instead
                 bestIdx = nearIdx;
-                cutDist = true; // do not add roboSize to distance in ToTobotMotion
-                //System.out.println("Applying MIST");
             }
         }
 
@@ -165,7 +161,7 @@ public class TangentGraph {
         // Odd index means end of obstacle sector, angle correction should be positive
         final int turnSign = Utils.isEven(bestIdx) ? -1 : 1;
 
-        final Utils.PolarTurn turn = new Utils.PolarTurn(Nodes.get(bestIdx), turnSign, cutDist);
+        final Utils.PolarTurn turn = new Utils.PolarTurn(Nodes.get(bestIdx), turnSign);
         return turn;
     }
 
