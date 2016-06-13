@@ -13,45 +13,46 @@ public class TangentBug implements IAlgorithm {
     public boolean run(IRobot r, int goal_x, int goal_y) {
         final Point goal = new Point(goal_x, goal_y);
 
+        boolean tryTillGoal = true;
         while (true) {
-            if (RobotUtils.TillGoal(r, goal, NearObstacle, NearGoal)) {
+            if (tryTillGoal && RobotUtils.TillGoal(r, goal, NearObstacle, NearGoal)) {
                 // goal reached
                 return true;
             }
+            tryTillGoal = false;
 
-            while (true) {
-                final TangentGraph tg = RobotUtils.ScanAround(r, goal_x, goal_y);
+            final TangentGraph tg = RobotUtils.ScanAround(r, goal_x, goal_y);
 
-                final int goalDist = Utils.GetDist(r.get_x(), r.get_y(), goal.x, goal.y);
-                if (tg.goalIsVisible(goalDist)) {
-                    System.out.println("Goal is visible");
-                    break;
+            final int goalDist = Utils.GetDist(r.get_x(), r.get_y(), goal.x, goal.y);
+            if (tg.goalIsVisible(goalDist)) {
+                // цель видна, попробуем двигаться к ней на следующей итерации цикла
+                tryTillGoal = true;
+                System.out.println("Goal is visible");
+                continue;
+            }
+
+            System.out.println("Goal is NOT visible");
+
+            final PolarTurn best = tg.GetBestRoute(new Point(r.get_x(), r.get_y()), goal);
+            if (best == null) {
+                // No best node, start following wall
+                final Utils.FollowWallDirection fwd = tg.GetFollowWallDirection(
+                        r.get_x(),
+                        r.get_y(),
+                        goal_x,
+                        goal_y
+                );
+                final boolean followWallSuccess = FollowWall(r, fwd, tg.dReach, goal_x, goal_y);
+                if (!followWallSuccess) {
+                    System.out.println("FollowWall FAILURE (loop)");
+                    return false; // loop detected
                 }
-
-                System.out.println("Goal is NOT visible");
-
-                final PolarTurn best = tg.GetBestRoute(new Point(r.get_x(), r.get_y()), goal);
-                if (best == null) {
-                    // No best node, start following wall
-                    final Utils.FollowWallDirection fwd = tg.GetFollowWallDirection(
-                            r.get_x(),
-                            r.get_y(),
-                            //r.get_angle(),
-                            goal_x,
-                            goal_y
-                    );
-                    final boolean followWallSuccess = FollowWall(r, fwd, tg.dReach, goal_x, goal_y);
-                    if (!followWallSuccess) {
-                        System.out.println("FollowWall FAILURE (loop)");
-                        return false; // loop detected
-                    }
-                    System.out.println("FollowWall SUCCESS");
-                } else {
-                    // move to the best node
-                    System.out.println("Moving to best node: dist:"+best.polar.distance+" angle:"+best.polar.angle+" deg:"+Utils.rad2deg(best.polar.angle));
-                    RobotUtils.MoveTo(r, best);
-                    System.out.println(" - Moved");
-                }
+                System.out.println("FollowWall SUCCESS");
+            } else {
+                // move to the best node
+                System.out.println("Moving to best node: dist:" + best.polar.distance + " angle:" + best.polar.angle + " deg:" + Utils.rad2deg(best.polar.angle));
+                RobotUtils.MoveTo(r, best);
+                System.out.println(" - Moved");
             }
         }
     }

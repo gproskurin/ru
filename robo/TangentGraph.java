@@ -122,7 +122,7 @@ public class TangentGraph {
         int bestIdx = -1;
         int bestDist = Integer.MAX_VALUE;
         for (int i = 0; i < Nodes.size(); ++i) {
-            final Utils.Polar node = Nodes.get(i);
+            final Utils.Polar node = getRobotMotion(i).polar;
 
             final Point delta = Utils.PolarToDecart(node); // shift from current robot position
             final Point obstacleNode = new Point(robo.x + delta.x, robo.y + delta.y);
@@ -156,13 +156,15 @@ public class TangentGraph {
             }
         }
 
+        return getRobotMotion(bestIdx);
+    }
+
+    private Utils.PolarTurn getRobotMotion(int idx) {
         // Used later to calculate angle correction. See ToRobotMotion() function for details.
         // Even index means begin of obstacle sector, angle correction should be negative
         // Odd index means end of obstacle sector, angle correction should be positive
-        final int turnSign = Utils.isEven(bestIdx) ? -1 : 1;
-
-        final Utils.PolarTurn turn = new Utils.PolarTurn(Nodes.get(bestIdx), turnSign);
-        return turn;
+        final int turnSign = Utils.isEven(idx) ? -1 : 1;
+        return new Utils.PolarTurn(Nodes.get(idx), turnSign);
     }
 
     Utils.FollowWallDirection GetFollowWallDirection(int robo_x, int robo_y, int goal_x, int goal_y) {
