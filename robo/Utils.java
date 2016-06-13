@@ -34,7 +34,7 @@ public class Utils {
         double angleCorrection = Math.asin((double)(roboSize*2)/(double)p.polar.distance);
         if (p.turnSign < 0)
             angleCorrection = -angleCorrection;
-        final int distCorrection = roboSize;
+        final int distCorrection = 0;//-2*roboSize;
         return new Polar(p.polar.distance + distCorrection, p.polar.angle + angleCorrection);
     }
 

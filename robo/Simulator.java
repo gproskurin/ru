@@ -52,15 +52,18 @@ public class Simulator {
             gear.right();
         } //включает поворот робота в направлении увеличения угла
 
-        // gets data from ultrosonic sensor/ returns -1 of no target in range or robot inside the target
+        // gets data from ultrasonic sensor/ returns -1 of no target in range or robot inside the target
         @Override
         public int get_distance() {
             int d = sensor.getDistance();
-            //return (d==255 ? -1 : d);  //for real robot
+            //return (d==255 ? -1 : d);  //for real lego robot
+            //return (d>100 ? -1 : d); // limit sensor range
             return d;
         }
 
         // function to turn the robot on a certain angle
+        // зная время полного оборота (OneTurnTime), вычисляем время поворота на заданный угол
+        // затем включаем вращение на вычисленное время
         @Override
         public void rotate(double a) {
             a = Utils.NormalizeAngle(a);  //angle to turn

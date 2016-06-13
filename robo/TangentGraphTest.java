@@ -167,11 +167,13 @@ public class TangentGraphTest {
         assertTrue(tg.goalIsVisible(100));
     }
 
+    // наложение препятствий
     @Test
     public void testAddSensorSample6() {
         TangentGraph tg = CreateTangentGraph();
         tg.AddSensorSample(1, 0.05);
         tg.AddSensorSample(2, 0.1);
+        // наложение препятствий: нет отрицательного сэмпла, большая разница дальности
         tg.AddSensorSample(101, 0.15);
         tg.AddSensorSample(102, 0.2);
         tg.AddSensorSample(-1, 0.9);

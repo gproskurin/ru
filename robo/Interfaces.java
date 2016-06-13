@@ -6,9 +6,8 @@ public class Interfaces {
         boolean run(); // returns true on success
     }
 
-
     public interface IAlgorithm {
-        boolean run(IRobot r, int goal_x, int goal_y);// returns true on success
+        boolean run(IRobot r, int goal_x, int goal_y); // returns true on success
     }
 
     public interface IRobot {

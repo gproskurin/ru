@@ -4,6 +4,9 @@ import ch.aplu.robotsim.Tools;
 import java.awt.Point;
 import robo.Interfaces.IRobot;
 
+/*
+Различные вспомогательные функции для движения робота
+*/
 public class RobotUtils {
 
     // scan around and create tangent graph
@@ -36,25 +39,31 @@ public class RobotUtils {
 
     // correction taking into account robot size
     static void MoveTo(IRobot r, Utils.PolarTurn node) {
-        final Utils.Polar motion = Utils.ToRobotMotion(node, r.get_params().RobotSize); //
+        final Utils.Polar motion = Utils.ToRobotMotion(node, r.get_params().RobotSize);
         final double deltaAngle = motion.angle - r.get_angle(); // convert from absolute angle to robot's POV angle
         r.rotate(deltaAngle);
         r.forward(motion.distance);
     }
 
+    // движение в сторону цели или до препятствия
     // return true if goal reached, false if obstacle occured
     static boolean TillGoal(IRobot r, final Point goal, int nearObstacleDist, int nearGoalDist)
     {
         System.out.println("TillGoal...");
-        final double angle = Utils.ComputeAngle(r.get_x(), r.get_y(), goal.x, goal.y); //find a direction where to turn. angle from robot to goal
-        r.rotate(angle - r.get_angle());
+        final double absolute_angle = Utils.ComputeAngle(r.get_x(), r.get_y(), goal.x, goal.y); //find a direction where to turn. angle from robot to goal
+        r.rotate(absolute_angle - r.get_angle()); // вычисляем угол относитеьно робота и поворачиваемся
+
+        // начинаем движение к цели
         r.forward();
         while (true) {
             if (PointReached(r, goal, nearGoalDist)) {
+                // достигли цели
                 r.stop();
                 System.out.println(" - TillGoal: goal reached");
                 return true;
             }
+
+            // цели пока не достигли, контролируем расстояние до препятствия
             final int d = r.get_distance();
             if (d >= 0 && d <= nearObstacleDist) { //we reached an obstacle
                 r.stop();
@@ -65,7 +74,10 @@ public class RobotUtils {
         }
     }
 
-    static boolean PointReached(IRobot r, final Point goal, int nearDist) {
-        return Utils.GetDist(r.get_x(),r.get_y(), goal.x, goal.y) <= nearDist;
+    // Находится ли робот в окрестности точки point, с учётом погрешности nearDist
+    static boolean PointReached(IRobot r, final Point point, int nearDist) {
+        return Math.abs(r.get_x() - point.x) <= nearDist
+                && Math.abs(r.get_y() - point.y) <= nearDist;
+        //return Utils.GetDist(r.get_x(),r.get_y(), point.x, point.y) <= nearDist;
     }
 }
